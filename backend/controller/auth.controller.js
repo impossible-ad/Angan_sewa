@@ -1,5 +1,7 @@
 import dotenv from "dotenv";
 import db from "../config/dbconnect.js";
+import jwt from "jsonwebtoken";
+import bcryptjs from "bcryptjs"
 
 
 dotenv.config();
@@ -25,10 +27,55 @@ export const login = async (req, res) => {
             });
         }
 
+        const token = await jwt.sign(
+            {
+                id: user.id,
+                name: user.name,
+                email: user.id
+            },
+            process.env.SECRET_KEY,
+            {
+                expiresIn: process.env.EXPIRES
+            });
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: "strict",
+        });
+
+        const isMatch = await bcryptjs.compare(password, user.password);
+        if (!isMatch) {
+            res.status(401).json({
+                message: "Invalid Credentials"
+            })
+        }
+
+        res.status(200).json({
+            message: "login Successful",
+            user: {
+                "id": user.id,
+                "email": user.email,
+                //"token": token
+                // "password": user.password,
+            }
+        });
 
     } catch (error) {
         console.log("error");
+    };
+};
 
+export const signOut = async (req, res) => {
+
+    try {
+        res.clearCookie("token");
+        res.status(200).json({
+            message: "successfully signed out"
+        })
+
+    } catch (error) {
+        console.log(error);
     }
+};
 
-}
