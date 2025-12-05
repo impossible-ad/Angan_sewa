@@ -51,7 +51,7 @@ export const login = async (req, res) => {
             })
         }
 
-        res.status(200).json({
+        return res.status(200).json({
             message: "login Successful",
             user: {
                 "id": user.id,
@@ -70,7 +70,7 @@ export const signOut = async (req, res) => {
 
     try {
         res.clearCookie("token");
-        res.status(200).json({
+        return res.status(200).json({
             message: "successfully signed out"
         })
 

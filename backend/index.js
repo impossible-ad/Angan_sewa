@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from 'dotenv';
 import db from "./config/dbconnect.js";
 import authRouter from "./routes/auth.route.js";
+import serviceRouter from "./routes/service.route.js";
 
 
 dotenv.config();
@@ -12,6 +13,7 @@ const port = process.env.port;
 app.use(express.json());
 
 app.use("/api/auth", authRouter);
+app.use("/api/service", serviceRouter);
 
 try {
     await db.connect();
