@@ -14,6 +14,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRouter);
 app.use("/api/service", serviceRouter);
+app.use("/uploads", express.static("uploads"));
 
 try {
     await db.connect();
