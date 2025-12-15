@@ -5,7 +5,6 @@ export const addService = async (req, res) => {
   try {
     const { name, description, address } = req.body;
     const img = req.file;
-    console.log(req.file);
 
     if (!name || !description || !address) {
       if (req.file) {
