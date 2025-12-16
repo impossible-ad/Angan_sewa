@@ -5,6 +5,7 @@ import authRouter from "./routes/auth.route.js";
 import serviceRouter from "./routes/service.route.js";
 import branchRouter from "./routes/branch.route.js";
 import siteRouter from "./routes/site.route.js";
+import { globalErrorHandler } from "./middleware/globalErrorHandler.js";
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.use("/api/service", serviceRouter);
 app.use("/api/branch", branchRouter);
 app.use("/api/site", siteRouter);
 app.use("/uploads", express.static("uploads"));
+app.use(globalErrorHandler);
 
 try {
   await db.connect();

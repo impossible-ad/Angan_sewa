@@ -1,7 +1,7 @@
 import db from "../config/dbconnect.js";
 import { removeImg } from "../utils/removeimg.js";
 
-export const addService = async (req, res) => {
+export const addService = async (req, res, next) => {
   try {
     const { name, description, address, branch_id } = req.body;
     const img = req.file;
@@ -35,11 +35,11 @@ export const addService = async (req, res) => {
       message: "New Service Added",
     });
   } catch (error) {
-    console.log(" Service Failed to Add", error);
+    next(error);
   }
 };
 
-export const deleteService = async (req, res) => {
+export const deleteService = async (req, res, next) => {
   try {
     const { id } = req.params;
 
@@ -62,11 +62,11 @@ export const deleteService = async (req, res) => {
       message: "Service succesfully Deleted",
     });
   } catch (error) {
-    console.log(" Service Failed to delete");
+    next(error);
   }
 };
 
-export const editService = async (req, res) => {
+export const editService = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { name, description, address, img } = req.body;
@@ -90,11 +90,11 @@ export const editService = async (req, res) => {
       message: "New Service Added",
     });
   } catch (error) {
-    console.log(" Service Failed to Add", error);
+    next(error);
   }
 };
 
-export const getAllService = async (req, res) => {
+export const getAllService = async (req, res, next) => {
   try {
     const [result] = await db.execute(`SELECT 
      s.id,
@@ -113,6 +113,6 @@ export const getAllService = async (req, res) => {
       data: result,
     });
   } catch (error) {
-    console.log("failed to get all services listed");
+    next(error);
   }
 };

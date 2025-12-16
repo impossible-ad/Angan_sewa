@@ -5,7 +5,7 @@ import bcryptjs from "bcryptjs";
 
 dotenv.config();
 
-export const login = async (req, res) => {
+export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
@@ -63,17 +63,17 @@ export const login = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log("error");
+    next(error);
   }
 };
 
-export const signOut = async (req, res) => {
+export const signOut = async (req, res, next) => {
   try {
     res.clearCookie("token");
     return res.status(200).json({
       message: "successfully signed out",
     });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };

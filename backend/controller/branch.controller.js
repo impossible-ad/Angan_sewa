@@ -1,6 +1,6 @@
 import db from "../config/dbconnect.js";
 
-export const addProvince = async (req, res) => {
+export const addProvince = async (req, res, next) => {
   try {
     const { province_name } = req.body;
     console.log(req.body);
@@ -29,11 +29,11 @@ export const addProvince = async (req, res) => {
       message: "New Province Sucessfully Created",
     });
   } catch (error) {
-    console.log("failed to add province", error);
+    next(error);
   }
 };
 
-export const getAllProvince = async (req, res) => {
+export const getAllProvince = async (req, res, next) => {
   try {
     const [result] = await db.execute(
       `SELECT 
@@ -50,11 +50,12 @@ export const getAllProvince = async (req, res) => {
       data: result,
     });
   } catch (error) {
-    console.log("failed to get all data", error);
+    next(error);
+    // console.log("failed to get all data", error);
   }
 };
 
-export const deleteProvince = async (req, res) => {
+export const deleteProvince = async (req, res, next) => {
   const { province_id } = req.params;
 
   try {
@@ -73,7 +74,7 @@ export const deleteProvince = async (req, res) => {
       message: "province successfully deleted",
     });
   } catch (error) {
-    console.log("Failed to delete province", error);
+    next(error);
   }
 };
 
@@ -117,11 +118,11 @@ export const addDistrict = async (req, res) => {
       message: "district successfully added",
     });
   } catch (error) {
-    console.log("Failed to add district");
+    next(error);
   }
 };
 
-export const getAllDistrict = async (req, res) => {
+export const getAllDistrict = async (req, res, next) => {
   try {
     const [resultD] = await db.execute(`SELECT 
       d.district_id,
@@ -137,11 +138,11 @@ export const getAllDistrict = async (req, res) => {
       data: resultD,
     });
   } catch (error) {
-    console.log("failed to get all district values", error);
+    next(error);
   }
 };
 
-export const deleteDistrict = async (req, res) => {
+export const deleteDistrict = async (req, res, next) => {
   const { district_id } = req.params;
   try {
     const [inputtedDid] = await db.execute(
@@ -161,11 +162,11 @@ export const deleteDistrict = async (req, res) => {
       message: "district successfully deleted",
     });
   } catch (error) {
-    console.log("failed to delete district");
+    next(error);
   }
 };
 
-export const addBranch = async (req, res) => {
+export const addBranch = async (req, res, next) => {
   const { branch_name, remarks, district_id } = req.body;
   try {
     if (!branch_name || !district_id) {
@@ -202,11 +203,11 @@ export const addBranch = async (req, res) => {
       message: "branch added succesfully",
     });
   } catch (error) {
-    console.log("failed to add branch");
+    next(error);
   }
 };
 
-export const getAllBranch = async (req, res) => {
+export const getAllBranch = async (req, res, next) => {
   try {
     const [resultB] = await db.execute(
       `SELECT 
@@ -223,11 +224,11 @@ export const getAllBranch = async (req, res) => {
       data: resultB,
     });
   } catch (error) {
-    console.log("failed to get branch details", error);
+    next(error);
   }
 };
 
-export const deleteBranch = async (req, res) => {
+export const deleteBranch = async (req, res, next) => {
   const { branch_id } = req.params;
   try {
     const [inputtedBid] = await db.execute(
@@ -245,6 +246,6 @@ export const deleteBranch = async (req, res) => {
       message: "branch successfully deleted",
     });
   } catch (error) {
-    console.log("failed to delete branch");
+    next(error);
   }
 };

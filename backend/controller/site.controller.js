@@ -1,6 +1,6 @@
 import db from "../config/dbconnect.js";
 
-export const addInquiry = async (req, res) => {
+export const addInquiry = async (req, res, next) => {
   const { name, phone, address, email, description, branch_id } = req.body;
   try {
     if (!name || !phone || !address || !branch_id) {
@@ -17,11 +17,11 @@ export const addInquiry = async (req, res) => {
       mesage: "inquiry succesfully registered",
     });
   } catch (error) {
-    console.log("failed to add your inquiry");
+    next(error);
   }
 };
 
-export const getAllInquiry = async (req, res) => {
+export const getAllInquiry = async (req, res, next) => {
   try {
     const [inquiryResult] = await db.execute(`SELECT
        i.inquiry_id,
@@ -41,11 +41,11 @@ export const getAllInquiry = async (req, res) => {
       data: inquiryResult,
     });
   } catch (error) {
-    console.log("failed to get inquiries");
+    next(error);
   }
 };
 
-export const addReview = async (req, res) => {
+export const addReview = async (req, res, next) => {
   const { name, star, description, branch_id } = req.body;
   try {
     if (!name || !description || !branch_id) {
@@ -62,11 +62,11 @@ export const addReview = async (req, res) => {
       message: "Review Added Succesfully",
     });
   } catch (error) {
-    console.log("Failed to add your Review", error);
+    next(error);
   }
 };
 
-export const getAllReview = async (req, res) => {
+export const getAllReview = async (req, res, next) => {
   try {
     const [reviewResult] = await db.execute(`select
         r.review_id,
@@ -84,6 +84,6 @@ export const getAllReview = async (req, res) => {
       data: reviewResult,
     });
   } catch (error) {
-    console.log("failed to get reviews");
+    next(error);
   }
 };
