@@ -123,13 +123,21 @@ export const addDistrict = async (req, res) => {
 
 export const getAllDistrict = async (req, res) => {
   try {
-    const [resultD] = await db.execute("SELECT * FROM district");
+    const [resultD] = await db.execute(`SELECT 
+      d.district_id,
+      d.district_name,
+      GROUP_CONCAT(b.branch_name) as branches 
+       FROM district d
+       LEFT JOIN branch b
+       ON d.district_id = b.district_id
+       GROUP BY d.district_id, d.district_name`);
+
     return res.status(200).json({
       message: "successfully retrieved all district's data",
       data: resultD,
     });
   } catch (error) {
-    console.log("failed to get all district values");
+    console.log("failed to get all district values", error);
   }
 };
 
@@ -204,11 +212,11 @@ export const getAllBranch = async (req, res) => {
       `SELECT 
       b.branch_id,
       b.branch_name,
-      b.remarks,
-     d.district_name
-FROM branch b
-LEFT JOIN district d
-ON b.district_id = d.district_id`
+      GROUP_CONCAT(s.name) as services
+      FROM branch b
+      LEFT JOIN services s
+      ON b.branch_id = s.branch_id
+      GROUP BY b.branch_id,b.branch_id `
     );
     return res.status(200).json({
       message: "Successfully retrieved all  branch data",
@@ -231,6 +239,11 @@ export const deleteBranch = async (req, res) => {
         message: "branch id not found",
       });
     }
+
+    await db.execute("DELETE FROM branch WHERE branch_id =?", [branch_id]);
+    return res.status(200).json({
+      message: "branch successfully deleted",
+    });
   } catch (error) {
     console.log("failed to delete branch");
   }

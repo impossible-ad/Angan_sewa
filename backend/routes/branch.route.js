@@ -3,6 +3,7 @@ import {
   addBranch,
   addDistrict,
   addProvince,
+  deleteBranch,
   deleteDistrict,
   deleteProvince,
   getAllBranch,
@@ -20,5 +21,6 @@ branchRouter.get("/getalldistrict", getAllDistrict);
 branchRouter.delete("/deletedistrict/:district_id", deleteDistrict);
 branchRouter.post("/addbranch", addBranch);
 branchRouter.get("/getallbranch", getAllBranch);
+branchRouter.delete("/deletebranch/:branch_id", deleteBranch);
 
 export default branchRouter;

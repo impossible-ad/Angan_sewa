@@ -37,3 +37,30 @@ CREATE TABLE branch(
     remarks VARCHAR(255) NULL,
     FOREIGN KEY (district_id) REFERENCES district(district_id)
 )
+
+
+CREATE TABLE inquiry (
+    inquiry_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    email VARCHAR(150) NULL,
+    description TEXT NOT NULL,
+    branch_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (branch_id)
+        REFERENCES branch(branch_id)
+
+)
+
+CREATE TABLE review(
+    review_id INT AUTO_INCREMENT PRIMARY KEY,
+    star INT NULL,
+    description TEXT NOT NULL,
+    branch_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (branch_id) REFERENCES branch(branch_id)
+
+    --ALTER TABLE REVIEW ADD FOREIGN KEY (branch_id) REFERENCES branch(branch_id);
+)
