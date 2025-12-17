@@ -20,12 +20,14 @@ CREATE TABLE services(
 
 CREATE TABLE province (
     province_id INT AUTO_INCREMENT PRIMARY KEY,
-    province_name VARCHAR(100) NOT NULL UNIQUE
+    province_name VARCHAR(100) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE district (
     district_id INT AUTO_INCREMENT PRIMARY KEY,
     district_name VARCHAR(100) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     province_id INT NOT NULL,
     FOREIGN KEY (province_id) REFERENCES province(province_id)
 );
@@ -35,6 +37,7 @@ CREATE TABLE branch(
     branch_name VARCHAR(100) NOT NULL,
     district_id INT NOT NULL,
     remarks VARCHAR(255) NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (district_id) REFERENCES district(district_id)
 )
 

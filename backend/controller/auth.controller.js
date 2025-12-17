@@ -58,8 +58,7 @@ export const login = async (req, res, next) => {
         id: user.id,
         email: user.email,
         role: user.role,
-        //"token": token
-        // "password": user.password,
+        token: token,
       },
     });
   } catch (error) {

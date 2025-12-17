@@ -4,11 +4,10 @@ import { removeImg } from "../utils/removeimg.js";
 export const addService = async (req, res, next) => {
   try {
     const { name, description, address, branch_id } = req.body;
-    const img = req.file;
-
+    console.log(req.file);
     if (!name || !description || !address || !branch_id) {
       if (req.file) {
-        removeImg(req.file.imagePath);
+        removeImg(req.file.path);
       }
       return res.status(400).json({
         message: "please provide all required data",
@@ -20,7 +19,7 @@ export const addService = async (req, res, next) => {
     );
     if (inputtedBid === 0) {
       if (req.file) {
-        removeImg(req.file.imagePath);
+        removeImg(req.file.path);
       }
       return res.status(403).json({
         message: "branch not found",
@@ -35,6 +34,9 @@ export const addService = async (req, res, next) => {
       message: "New Service Added",
     });
   } catch (error) {
+    if (req.file) {
+      removeImg(req.file.path);
+    }
     next(error);
   }
 };
@@ -45,7 +47,7 @@ export const deleteService = async (req, res, next) => {
 
     const [inputedId] = await db.execute(
       "SELECT id,img FROM services where id=?",
-      [id, img]
+      [id]
     );
 
     if (inputedId.length == 0) {

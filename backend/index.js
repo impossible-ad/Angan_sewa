@@ -6,6 +6,7 @@ import serviceRouter from "./routes/service.route.js";
 import branchRouter from "./routes/branch.route.js";
 import siteRouter from "./routes/site.route.js";
 import { globalErrorHandler } from "./middleware/globalErrorHandler.js";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ const app = express();
 const port = process.env.port;
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/api/auth", authRouter);
 app.use("/api/service", serviceRouter);
@@ -25,7 +27,7 @@ try {
   await db.connect();
   console.log("MY SQL CONNECTED SUCCESSFULLY");
 } catch (error) {
-  console.log("MY SQL CONNECTION FAILED");
+  console.log("MY SQL CONNECTION FAILED", error);
 }
 
 app.listen(port, () => {
