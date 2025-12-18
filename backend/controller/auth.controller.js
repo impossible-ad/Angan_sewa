@@ -76,3 +76,95 @@ export const signOut = async (req, res, next) => {
     next(error);
   }
 };
+
+export const addBManager = async (req, res, next) => {
+  const { name, email, password, branch_id } = req.body;
+  try {
+    if (!name || !email || !password || !branch_id) {
+      return res.status(404).json({
+        message: "pleasse provide all details",
+      });
+    }
+    const [existingB] = await db.execute(
+      "SELECT branch_id FROM branch where branch_id=?",
+      [branch_id]
+    );
+    if (existingB.length === 0) {
+      return res.status(404).json({
+        message: "branch not found",
+      });
+    }
+
+    const hashedPassword = await bcryptjs.hash(password, 10);
+    await db.execute(
+      "INSERT INTO users(name,email,password,branch_id) VALUES(?,?,?,?)",
+      [name, email, hashedPassword, branch_id]
+    );
+    return res.status(200).json({
+      message: "branch manager successfully added",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteBManager = async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const [existsBm] = await db.execute("SELECT id from users WHERE id=?", [
+      id,
+    ]);
+    if (existsBm.length === 0) {
+      return res.status(403).json({
+        message: "branch manager not found",
+      });
+    }
+
+    await db.execute("DELETE FROM users where id=?", [id]);
+    return res.status(200).json({
+      message: "branch manager successfully deleted ",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const editBM = async (req, res, next) => {
+  const { id } = req.params;
+  const { name, role, email, password } = req.body;
+  try {
+    const [existsE] = await db.execute(
+      "SELECT email from users where email=?",
+      [email]
+    );
+    if (existsE.length > 0) {
+      return res.status(402).json({
+        message: "email already in use",
+      });
+    }
+
+    const [existsBM] = await db.execute("SELECT * from users WHERE id=?", [id]);
+
+    if (existsBM.length === 0) {
+      return res.status(403).json({
+        message: "branch manager not found",
+      });
+    }
+
+    const branchM = existsBM[0];
+    const updatedName = name || branchM.name;
+    const updatedrole = role || branchM.role;
+
+    const hashedCPassword = await bcryptjs.hash(password, 10);
+
+    await db.execute(
+      "INSERT INTO users(name,role,email,password) VALUES(?,?,?,?)",
+      [updatedName, updatedrole, email, hashedCPassword]
+    );
+    return res.status(200).json({
+      message: "branch manager credentials successfully updated",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
