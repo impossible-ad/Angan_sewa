@@ -10,6 +10,7 @@ const serviceStorage = multer.diskStorage({
     cb(null, uniqueSuffix + file.originalname);
   },
 });
+
 const galleryStorage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "uploads/gallery");
@@ -20,6 +21,17 @@ const galleryStorage = multer.diskStorage({
     cb(null, uniqueSuffix + file.originalname);
   },
 });
+const staffStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/staff");
+  },
+
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, uniqueSuffix + file.originalname);
+  },
+});
 
 export const serviceUpload = multer({ storage: serviceStorage });
 export const galleryUpload = multer({ storage: galleryStorage });
+export const staffUpload = multer({ storage: staffStorage });

@@ -98,6 +98,10 @@ CREATE TABLE staff (
     id INT NULL,
     branch_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (id)REFERENCES services(id),
      FOREIGN KEY (branch_id)REFERENCES branch(branch_id)
+
+     ALTER TABLE staff 
+ADD COLUMN id INT NULL,
+ADD CONSTRAINT fk_user_branch 
+FOREIGN KEY (id) REFERENCES services(id);
 );

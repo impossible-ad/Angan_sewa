@@ -7,6 +7,7 @@ import branchRouter from "./routes/branch.route.js";
 import siteRouter from "./routes/site.route.js";
 import { globalErrorHandler } from "./middleware/globalErrorHandler.js";
 import cookieParser from "cookie-parser";
+import staffRouter from "./routes/staff.route.js";
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/service", serviceRouter);
 app.use("/api/branch", branchRouter);
 app.use("/api/site", siteRouter);
+app.use("/api/staff", staffRouter);
 app.use("/uploads", express.static("uploads"));
 app.use(globalErrorHandler);
 

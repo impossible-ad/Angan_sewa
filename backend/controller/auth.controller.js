@@ -168,3 +168,87 @@ export const editBM = async (req, res, next) => {
     next(error);
   }
 };
+
+export const loginBM = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ message: "Email and password are required" });
+    }
+
+    const [result] = await db.execute(
+      `SELECT 
+      u.name,
+      u.email,
+      u.password,
+      u.role,
+      u.branch_id,
+      b.branch_name
+      FROM users u
+      LEFT JOIN branch b
+      ON u.branch_id = b.branch_id
+      where u.email=?`,
+      [email]
+    );
+    const user = result[0];
+
+    if (result.length === 0) {
+      return res.status(400).json({
+        message: "Invalid credentials",
+      });
+    }
+
+    const token = await jwt.sign(
+      {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+      process.env.SECRET_KEY,
+      {
+        expiresIn: process.env.EXPIRES,
+      }
+    );
+
+    res.cookie("tokenM", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+    });
+
+    const isMatch = await bcryptjs.compare(password, user.password);
+    if (!isMatch) {
+      res.status(401).json({
+        message: "Invalid Credentials",
+      });
+    }
+
+    return res.status(200).json({
+      message: " branch manager login Successful",
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        token: token,
+        branch: user.branch_name,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const signOutBM = async (req, res, next) => {
+  try {
+    res.clearCookie("tokenM");
+    return res.status(200).json({
+      message: "successfully  branch manager signed out",
+    });
+  } catch (error) {
+    next(error);
+  }
+};

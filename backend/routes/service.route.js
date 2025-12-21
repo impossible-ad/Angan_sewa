@@ -18,7 +18,12 @@ serviceRouter.post(
   serviceUpload.single("image"),
   addService
 );
-serviceRouter.delete("/deleteservice/:id", isLogin, isAdmin, deleteService);
-serviceRouter.patch("/editservice/:id", isLogin, isAdmin, editService);
+serviceRouter.delete(
+  "/deleteservice/:service_id",
+  isLogin,
+  isAdmin,
+  deleteService
+);
+serviceRouter.patch("/editservice/:service_id", isLogin, isAdmin, editService);
 serviceRouter.get("/getallservice", isLogin, isAdmin, getAllService);
 export default serviceRouter;

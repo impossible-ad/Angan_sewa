@@ -43,11 +43,11 @@ export const addService = async (req, res, next) => {
 
 export const deleteService = async (req, res, next) => {
   try {
-    const { id } = req.params;
+    const { service_id } = req.params;
 
     const [inputedId] = await db.execute(
-      "SELECT id,img FROM services where id=?",
-      [id]
+      "SELECT service_id FROM services where service_id=?",
+      [service_id]
     );
 
     if (inputedId.length == 0) {
@@ -59,7 +59,7 @@ export const deleteService = async (req, res, next) => {
       removeImg(`uploads/services/${inputedId[0].img.split("/").pop()}`);
     }
 
-    await db.execute("DELETE FROM services where id=?", [id]);
+    await db.execute("DELETE FROM services where service_id=?", [service_id]);
     return res.status(200).json({
       message: "Service succesfully Deleted",
     });
@@ -70,12 +70,13 @@ export const deleteService = async (req, res, next) => {
 
 export const editService = async (req, res, next) => {
   try {
-    const { id } = req.params;
+    const { service_id } = req.params;
     const { name, description, address, img } = req.body;
 
-    const [existing] = await db.execute("SELECT * FROM services WHERE id = ?", [
-      id,
-    ]);
+    const [existing] = await db.execute(
+      "SELECT * FROM services WHERE service_id = ?",
+      [service_id]
+    );
 
     if (existing.length === 0) {
       return res.status(400).json({
@@ -99,7 +100,7 @@ export const editService = async (req, res, next) => {
 export const getAllService = async (req, res, next) => {
   try {
     const [result] = await db.execute(`SELECT 
-     s.id,
+     s.service_id,
      s.name,
      s.description,
      s.address,
