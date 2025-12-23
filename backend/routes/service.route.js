@@ -5,25 +5,30 @@ import {
   editService,
   getAllService,
 } from "../controller/service.controller.js";
-import { isAdmin } from "../middleware/isAdmin.js";
 import { serviceUpload } from "../utils/multerHandler.js";
 import { isLogin } from "../middleware/isLogin.js";
+import { authorizeRoles } from "../middleware/isAuthorized.js";
 
 const serviceRouter = express.Router();
 
 serviceRouter.post(
   "/addservice",
   isLogin,
-  isAdmin,
+  authorizeRoles("branch_manager"),
   serviceUpload.single("image"),
   addService
 );
 serviceRouter.delete(
   "/deleteservice/:service_id",
   isLogin,
-  isAdmin,
+  authorizeRoles("branch_manager"),
   deleteService
 );
-serviceRouter.patch("/editservice/:service_id", isLogin, isAdmin, editService);
-serviceRouter.get("/getallservice", isLogin, isAdmin, getAllService);
+serviceRouter.patch(
+  "/editservice/:service_id",
+  isLogin,
+  authorizeRoles("branch_manager"),
+  editService
+);
+serviceRouter.get("/getallservice", isLogin, authorizeRoles("branch_manager"), getAllService);
 export default serviceRouter;

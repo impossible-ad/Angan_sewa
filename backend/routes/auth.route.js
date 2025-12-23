@@ -4,20 +4,31 @@ import {
   deleteBManager,
   editBM,
   login,
-  loginBM,
   signOut,
-  signOutBM,
 } from "../controller/auth.controller.js";
 import { isLogin } from "../middleware/isLogin.js";
-import { isAdmin } from "../middleware/isAdmin.js";
+import { authorizeRoles } from "../middleware/isAuthorized.js";
 const authRouter = express.Router();
 
 authRouter.post("/login", login);
-authRouter.post("/bmlogin", loginBM);
 authRouter.post("/signout", isLogin, signOut);
-authRouter.post("/bmsignout", isLogin, signOutBM);
-authRouter.post("/addbranchmanager", isLogin, isAdmin, addBManager);
-authRouter.delete("/deletebranchmanager/:id", isLogin, isAdmin, deleteBManager);
-authRouter.patch("/editbranchmanager/:id", isLogin, isAdmin, editBM);
+authRouter.post(
+  "/addbranchmanager",
+  isLogin,
+  authorizeRoles("admin"),
+  addBManager
+);
+authRouter.delete(
+  "/deletebranchmanager/:id",
+  isLogin,
+  authorizeRoles("admin"),
+  deleteBManager
+);
+authRouter.patch(
+  "/editbranchmanager/:id",
+  isLogin,
+  authorizeRoles("admin"),
+  editBM
+);
 
 export default authRouter;

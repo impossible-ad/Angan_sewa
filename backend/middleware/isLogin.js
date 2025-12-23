@@ -4,7 +4,7 @@ export const isLogin = async (req, res, next) => {
     const token = req.cookies.token;
 
     if (!token) {
-      res.status(401).json({
+      return res.status(401).json({
         message: "hey hackey log in first",
       });
     }
@@ -14,6 +14,6 @@ export const isLogin = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };

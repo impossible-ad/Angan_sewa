@@ -2,9 +2,18 @@ import db from "../config/dbconnect.js";
 import { removeImg } from "../utils/removeimg.js";
 
 export const addService = async (req, res, next) => {
+  const { name, description, address, branch_id } = req.body;
+
   try {
-    const { name, description, address, branch_id } = req.body;
-    console.log(req.file);
+    if (req.user.branch_id !== branch_id) {
+      if (req.file) {
+        removeImg(req.file.path);
+      }
+      return res.status(403).json({
+        message: "permission not available to add staff in foreign branch",
+      });
+    }
+
     if (!name || !description || !address || !branch_id) {
       if (req.file) {
         removeImg(req.file.path);
@@ -98,8 +107,9 @@ export const editService = async (req, res, next) => {
 };
 
 export const getAllService = async (req, res, next) => {
+  const { role, branch_id } = req.user;
   try {
-    const [result] = await db.execute(`SELECT 
+    let query = `SELECT 
      s.service_id,
      s.name,
      s.description,
@@ -109,7 +119,14 @@ export const getAllService = async (req, res, next) => {
      b.branch_name
      FROM services s
      LEFT JOIN branch b
-     ON s.branch_id = b.branch_id `);
+     ON s.branch_id = b.branch_id `;
+    const queryParams = [];
+    if (role === "branch_manager") {
+      query += ` where s.branch_id =?`;
+      queryParams.push(branch_id);
+    }
+
+    const [result] = await db.execute(query, queryParams);
 
     return res.status(200).json({
       message: "all services are retrieved",

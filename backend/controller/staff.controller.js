@@ -15,6 +15,15 @@ export const addStaff = async (req, res, next) => {
   } = req.body;
 
   try {
+    if (req.user.branch_id !== branch_id) {
+      if (req.file) {
+        removeImg(req.file.path);
+      }
+      return res.status(403).json({
+        message: "permission not available to add staff in foreign branch",
+      });
+    }
+
     if (!name || !email || !position || !phone || !branch_id || !password) {
       if (req.file) {
         removeImg(req.file.path);
@@ -83,8 +92,9 @@ export const addStaff = async (req, res, next) => {
 };
 
 export const getAllStaff = async (req, res, next) => {
+  const { role, branch_id } = req.user;
   try {
-    const [resultS] = await db.execute(`SELECT
+    let query = `SELECT
      st.staff_id,
      st.name,
      st.email,
@@ -97,9 +107,17 @@ export const getAllStaff = async (req, res, next) => {
      b.branch_name
      FROM staff st
      LEFT JOIN services s ON st.service_id = s.service_id
-     LEFT JOIN branch b ON st.branch_id = b.branch_id `);
+     LEFT JOIN branch b ON st.branch_id = b.branch_id `;
     //s.name as service_name, to avoid name conflict as s.name overrides st.name as both column have same title
 
+    const queryParams = [];
+
+    if (role === "branch_manager") {
+      query += `where st.branch_id =?`;
+      queryParams.push(branch_id);
+    }
+
+    const [resultS] = await db.execute(query, queryParams);
     return res.status(200).json({
       message: " all staff data retrieved",
       data: resultS,

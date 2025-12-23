@@ -23,8 +23,9 @@ export const addInquiry = async (req, res, next) => {
 };
 
 export const getAllInquiry = async (req, res, next) => {
+  const { role, branch_id } = req.user;
   try {
-    const [inquiryResult] = await db.execute(`SELECT
+    let query = `SELECT
        i.inquiry_id,
        i.name,
        i.phone,
@@ -35,7 +36,15 @@ export const getAllInquiry = async (req, res, next) => {
        b.branch_name
        FROM inquiry i
        LEFT JOIN branch b
-       ON i.branch_id = b.branch_id`);
+       ON i.branch_id = b.branch_id`;
+
+    const queryParams = [];
+    if (role === "branch_manager") {
+      query += ` where i.branch_id = ?`;
+      queryParams.push(branch_id);
+    }
+
+    const [inquiryResult] = await db.execute(query, queryParams);
 
     return res.status(200).json({
       message: "succesfully retrieved relevant inquiries",
@@ -68,8 +77,9 @@ export const addReview = async (req, res, next) => {
 };
 
 export const getAllReview = async (req, res, next) => {
+  const { role, branch_id } = req.user;
   try {
-    const [reviewResult] = await db.execute(`select
+    let query = `select
         r.review_id,
         r.name,
         r.star,
@@ -78,7 +88,16 @@ export const getAllReview = async (req, res, next) => {
         b.branch_name
         From review r
         LEFT JOIN branch b
-        ON r.branch_id = b.branch_id`);
+        ON r.branch_id = b.branch_id`;
+
+    const queryParams = [];
+
+    if (role === "branch_manager") {
+      query += ` where r.branch_id=?`;
+      queryParams.push(branch_id);
+    }
+
+    const [reviewResult] = await db.execute(query, queryParams);
 
     return res.status(200).json({
       message: "Reviews Successfully Retrieved",
@@ -140,8 +159,27 @@ export const addGallery = async (req, res, next) => {
 };
 
 export const getAllGallery = async (req, res, next) => {
+  const { role, branch_id } = req.user;
   try {
-    const [resultG] = await db.execute("SELECT * FROM gallery");
+    let query = `SELECT
+    g.gallery_id,
+    g.title,
+    g.date,
+    g.location,
+    g.gallery_img,
+    g.branch_id
+     FROM gallery g
+     left join branch b
+     ON g.branch_id = b.branch_id`;
+
+    const queryParams = [];
+
+    if (role === "branch_manager") {
+      query += ` where g.branch_id =?`;
+      queryParams.push(branch_id);
+    }
+
+    const [resultG] = await db.execute(query, queryParams);
     return res.status(200).json({
       message: "successfully retrieved all gallery",
       data: resultG,

@@ -11,18 +11,58 @@ import {
   getAllProvince,
 } from "../controller/branch.controller.js";
 import { isLogin } from "../middleware/isLogin.js";
-import { isAdmin } from "../middleware/isAdmin.js";
+import { authorizeRoles } from "../middleware/isAuthorized.js";
 
 const branchRouter = express.Router();
 
-branchRouter.post("/addprovince", isLogin, isAdmin, addProvince);
-branchRouter.get("/getallprovince", isLogin,isAdmin, getAllProvince);
-branchRouter.delete("/deleteprovince/:province_id", isLogin,isAdmin, deleteProvince);
-branchRouter.post("/adddistrict", isLogin,isAdmin, addDistrict);
-branchRouter.get("/getalldistrict", isLogin,isAdmin, getAllDistrict);
-branchRouter.delete("/deletedistrict/:district_id", isLogin,isAdmin, deleteDistrict);
-branchRouter.post("/addbranch", isLogin,isAdmin, addBranch);
-branchRouter.get("/getallbranch", isLogin,isAdmin, getAllBranch);
-branchRouter.delete("/deletebranch/:branch_id", isLogin,isAdmin, deleteBranch);
+branchRouter.post(
+  "/addprovince",
+  isLogin,
+  authorizeRoles("admin"),
+  addProvince
+);
+branchRouter.get(
+  "/getallprovince",
+  isLogin,
+  authorizeRoles("admin"),
+  getAllProvince
+);
+branchRouter.delete(
+  "/deleteprovince/:province_id",
+  isLogin,
+  authorizeRoles("admin"),
+  deleteProvince
+);
+branchRouter.post(
+  "/adddistrict",
+  isLogin,
+  authorizeRoles("admin"),
+  addDistrict
+);
+branchRouter.get(
+  "/getalldistrict",
+  isLogin,
+  authorizeRoles("admin"),
+  getAllDistrict
+);
+branchRouter.delete(
+  "/deletedistrict/:district_id",
+  isLogin,
+  authorizeRoles("admin"),
+  deleteDistrict
+);
+branchRouter.post("/addbranch", isLogin, authorizeRoles("admin"), addBranch);
+branchRouter.get(
+  "/getallbranch",
+  isLogin,
+  authorizeRoles("admin"),
+  getAllBranch
+);
+branchRouter.delete(
+  "/deletebranch/:branch_id",
+  isLogin,
+  authorizeRoles("admin"),
+  deleteBranch
+);
 
 export default branchRouter;
