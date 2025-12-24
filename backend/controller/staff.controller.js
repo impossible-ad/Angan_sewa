@@ -62,7 +62,7 @@ export const addStaff = async (req, res, next) => {
       }
     }
 
-    const Path = req.file ? `uploads/staff/${req.file.filename}` : null;
+    const imgPath = req.file ? `uploads/staff/${req.file.filename}` : null;
     const hashedPasswordS = await bcrypt.hash(password, 10);
 
     await db.execute(
@@ -75,7 +75,7 @@ export const addStaff = async (req, res, next) => {
         description,
         branch_id,
         service_id,
-        Path,
+        imgPath,
         hashedPasswordS,
       ]
     );

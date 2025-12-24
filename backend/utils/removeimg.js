@@ -2,10 +2,17 @@ import fs from "fs";
 
 export const removeImg = (path) => {
   try {
-    if (fs.existsSync(path)) {
+    if (Array.isArray(path)) {
+      path.forEach((item) => {
+        const targetPath = typeof item === "object" ? item.path : imgPath;
+        if (fs.existsSync(targetPath)) {
+          fs.unlinkSync(targetPath);
+        }
+      });
+    } else if (typeof path === "string" && fs.existsSync(path)) {
       fs.unlinkSync(path);
     }
   } catch (error) {
-    console.log(`File Not Found ${path}`);
+    console.log(`File Not Found ${path}`, error);
   }
 };

@@ -10,6 +10,7 @@ import {
 import { isLogin } from "../middleware/isLogin.js";
 import { galleryUpload } from "../utils/multerHandler.js";
 import { authorizeRoles } from "../middleware/isAuthorized.js";
+import { branchMatch } from "../middleware/branchMatch.js";
 
 const siteRouter = express.Router();
 
@@ -18,6 +19,7 @@ siteRouter.get(
   "/getallinquiry",
   isLogin,
   authorizeRoles("branch_manager", "admin"),
+  branchMatch,
   getAllInquiry
 );
 siteRouter.post("/addreview", isLogin, addReview);
@@ -25,6 +27,7 @@ siteRouter.get(
   "/getallreview",
   isLogin,
   authorizeRoles("branch_manager", "admin"),
+  branchMatch,
   getAllReview
 );
 siteRouter.post(
@@ -32,12 +35,14 @@ siteRouter.post(
   isLogin,
   authorizeRoles("branch_manager"),
   galleryUpload.array("image", 20),
+  branchMatch,
   addGallery
 );
 siteRouter.get(
   "/getallgallery",
   isLogin,
   authorizeRoles("branch_manager", "admin"),
+  branchMatch,
   getAllGallery
 );
 

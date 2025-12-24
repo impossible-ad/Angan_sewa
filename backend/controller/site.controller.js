@@ -110,13 +110,11 @@ export const getAllReview = async (req, res, next) => {
 
 export const addGallery = async (req, res, next) => {
   const { title, date, location, branch_id } = req.body;
-  console.log(req.files);
-  console.log(req.body);
 
   try {
     if (!title || !date || !location || !branch_id) {
-      if (req.files && req.files.length > 0) {
-        req.files.forEach((file) => removeImg(file.path));
+      if (req.files) {
+        removeImg(req.files);
       }
 
       return res.status(403).json({
@@ -129,21 +127,19 @@ export const addGallery = async (req, res, next) => {
       [branch_id]
     );
     if (existingB.length === 0) {
-      if (req.files && req.files.length > 0) {
-        req.files.forEach((file) => removeImg(file.path));
+      if (req.files) {
+        removeImg(req.files);
       }
       return res.status(403).json({
         message: "branch not found",
       });
     }
     const insertPromises = req.files.map((file) => {
-      const paths = req.files
-        ? req.files.map((file) => `uploads/gallery/${file.filename}`).join(",")
-        : null;
+      const imgPath = `uploads/gallery/${file.filename}`;
 
       return db.execute(
         "INSERT INTO gallery(title,date,location,gallery_img,branch_id) VALUES(?,?,?,?,?)",
-        [title, date, location, paths, branch_id]
+        [title, date, location, imgPath, branch_id]
       );
     });
     await Promise.all(insertPromises);
@@ -151,8 +147,8 @@ export const addGallery = async (req, res, next) => {
       message: "photo and it`s details successfully added to gallery",
     });
   } catch (error) {
-    if (req.files && req.files.length > 0) {
-      req.files.forEach((file) => removeImg(file.path));
+    if (req.files) {
+      removeImg(req.files);
     }
     next(error);
   }

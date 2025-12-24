@@ -5,16 +5,7 @@ export const addService = async (req, res, next) => {
   const { name, description, address, branch_id } = req.body;
 
   try {
-    if (req.user.branch_id !== branch_id) {
-      if (req.file) {
-        removeImg(req.file.path);
-      }
-      return res.status(403).json({
-        message: "permission not available to add staff in foreign branch",
-      });
-    }
-
-    if (!name || !description || !address || !branch_id) {
+    if (!name || !description || !address) {
       if (req.file) {
         removeImg(req.file.path);
       }

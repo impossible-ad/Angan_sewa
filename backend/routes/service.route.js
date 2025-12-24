@@ -8,6 +8,7 @@ import {
 import { serviceUpload } from "../utils/multerHandler.js";
 import { isLogin } from "../middleware/isLogin.js";
 import { authorizeRoles } from "../middleware/isAuthorized.js";
+import { branchMatch } from "../middleware/branchMatch.js";
 
 const serviceRouter = express.Router();
 
@@ -16,19 +17,23 @@ serviceRouter.post(
   isLogin,
   authorizeRoles("branch_manager"),
   serviceUpload.single("image"),
+  branchMatch,
   addService
 );
 serviceRouter.delete(
   "/deleteservice/:service_id",
   isLogin,
   authorizeRoles("branch_manager"),
+  branchMatch,
   deleteService
 );
 serviceRouter.patch(
   "/editservice/:service_id",
   isLogin,
   authorizeRoles("branch_manager"),
+  branchMatch,
   editService
 );
-serviceRouter.get("/getallservice", isLogin, authorizeRoles("branch_manager"), getAllService);
+serviceRouter.get("/getallservice", isLogin, authorizeRoles("branch_manager","admin"),
+  branchMatch,getAllService);
 export default serviceRouter;
