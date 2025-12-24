@@ -17,7 +17,7 @@ export const addService = async (req, res, next) => {
       "SELECT branch_id from branch where branch_id=?",
       [branch_id]
     );
-    if (inputtedBid === 0) {
+    if (inputtedBid.length === 0) {
       if (req.file) {
         removeImg(req.file.path);
       }
@@ -99,6 +99,7 @@ export const editService = async (req, res, next) => {
 
 export const getAllService = async (req, res, next) => {
   const { role, branch_id } = req.user;
+
   try {
     let query = `SELECT 
      s.service_id,
