@@ -54,22 +54,22 @@ export const getAllGallery = async (req, res, next) => {
   const { province_id, district_id, branch_id } = req.query;
   try {
     let query = `SELECT
-    g.gallery_id,
-    g.title,
-    g.date,
-    g.location,
-    g.gallery_img,
-    g.branch_id,
-    b.branch_name,
-     d.district_id,
-   d.district_name,
-   d.province_id,
-   p.province_name
-     FROM gallery g
-    left join branch b ON g.branch_id = b.branch_id
-    LEFT JOIN district d ON b.district_id = d.district_id
-   LEFT JOIN province p ON d.province_id = p.province_id
-   WHERE 1=1`;
+      g.gallery_id,
+      g.title,
+      g.date,
+      g.location,
+      g.gallery_img,
+      g.branch_id,
+      b.branch_name,
+       b.district_id,
+     d.district_name,
+     d.province_id,
+     p.province_name
+       FROM gallery g
+      LEFT JOIN branch b ON g.branch_id = b.branch_id
+      LEFT JOIN district d ON b.district_id = d.district_id
+     LEFT JOIN province p ON d.province_id = p.province_id
+     WHERE 1=1`;
 
     const queryParams = [];
 
@@ -78,7 +78,7 @@ export const getAllGallery = async (req, res, next) => {
       queryParams.push(branch_id);
     }
     if (district_id) {
-      query += ` AND d.district_id = ?`;
+      query += ` AND b.district_id = ?`;
       queryParams.push(district_id);
     }
     if (province_id) {
