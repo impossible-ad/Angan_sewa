@@ -3,9 +3,10 @@ import { indexSlice } from "./indexSlice";
 export const authAPIs = indexSlice.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation({
-      query: () => ({
+      query: (data) => ({
         url: "/auth/login",
         method: "POST",
+        data,
       }),
       invalidatesTags: ["auth"],
     }),
