@@ -1,8 +1,14 @@
 import { useState } from "react";
 import Input from "./shared/Input";
 import { useLoginMutation } from "../redux/features/authSlice";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { setUser } from "../redux/features/authState";
 
 const Login = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [login] = useLoginMutation();
   const [formData, setFormData] = useState({ email: "", password: "" });
 
@@ -17,11 +23,18 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await login(formData).unwrap();
-      console.log(res);
+      if (!formData.email || !formData.password) {
+        toast.error("Please fill all the fields");
+        return;
+      }
+      const credentials = await login(formData).unwrap();
+      toast.success(`${credentials.message}`);
+      dispatch(setUser(credentials?.user));
+
+      return navigate("/admin/dashboard");
     } catch (error) {
-      alert("error:", error);
-      console.log(error);
+      toast.error("error:Something Wrong");
+      //alert("error:", error);
     }
   };
   return (

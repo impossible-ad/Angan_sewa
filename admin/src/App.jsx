@@ -1,9 +1,12 @@
-import Login from "./components/Login";
+import { RouterProvider } from "react-router-dom";
+import { router } from "./router/Index";
+import { ToastContainer } from "react-toastify";
 
 const App = () => {
   return (
     <div>
-      <Login />
+      <RouterProvider router={router} />
+      <ToastContainer />
     </div>
   );
 };

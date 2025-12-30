@@ -39,12 +39,22 @@ export const getAllProvince = async (req, res, next) => {
       `SELECT 
       p.province_id,
        p.province_name,
-       GROUP_CONCAT(CONCAT(d.district_name, ':' , d.district_id)SEPARATOR ',') as district
+       GROUP_CONCAT(d.district_name)
          FROM province p 
       LEFT JOIN district d 
       ON p.province_id = d.province_id
       GROUP BY p.province_id, p.province_name`
     );
+    // const [result] = await db.execute(
+    //   `SELECT
+    //   p.province_id,
+    //    p.province_name,
+    //    GROUP_CONCAT(CONCAT(d.district_name, ':' , d.district_id)SEPARATOR ',') as district
+    //      FROM province p
+    //   LEFT JOIN district d
+    //   ON p.province_id = d.province_id
+    //   GROUP BY p.province_id, p.province_name`
+    // );
     return res.status(200).json({
       message: "succesfully retrieved all province name",
       data: result,
