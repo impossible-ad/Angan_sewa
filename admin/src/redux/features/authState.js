@@ -16,7 +16,7 @@ const userSlice = createSlice({
       state.isAuth = !!action.payload;
     },
 
-    logout: (state) => {
+    clearUser: (state) => {
       state.email = "";
       state.role = "";
       state.isAuth = false;
@@ -24,5 +24,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { setUser, logout } = userSlice.actions;
+export const { setUser, clearUser } = userSlice.actions;
 export default userSlice.reducer;

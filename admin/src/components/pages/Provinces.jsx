@@ -1,16 +1,52 @@
-import { useGetAllProvincesQuery } from "../../redux/features/provinceSlice";
+import { toast } from "react-toastify";
+import {
+  useAddProvinceMutation,
+  useDeleteProvinceMutation,
+  useGetAllProvincesQuery,
+} from "../../redux/features/provinceSlice";
+import { useState } from "react";
+import Loading from "../shared/IsLoading";
 
 const Provinces = () => {
   const { data, isLoading, isError, error } = useGetAllProvincesQuery();
+  const [addProvince] = useAddProvinceMutation();
+  const [deleteProvince] = useDeleteProvinceMutation();
+  const [formData, setFormData] = useState({
+    province_name: "",
+  });
 
+  const handleDelete = async (province_id) => {
+    try {
+      await deleteProvince(province_id).unwrap();
+      toast.success("Province deleted successfully");
+    } catch (error) {
+      toast.error(error.data?.message || "failed to delete province");
+    }
+  };
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData({ ...formData, [id]: value });
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    //console.log("Payload check:", formData);
+    if (!formData.province_name) {
+      toast.error("Please enter a province name");
+      return;
+    }
+    try {
+      const res = await addProvince(formData).unwrap();
+      toast.success(res.message || "province added successfully");
+      setFormData({ province_name: "" });
+    } catch (error) {
+      toast.error(error.data?.message || "failed to add province");
+      console.log(error.data?.message);
+    }
+    return;
+  };
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-100 p-8 flex items-center justify-center">
-        <div className="text-xl text-gray-600">Loading provinces...</div>
-      </div>
-    );
+    return <Loading isLoading={isLoading} />;
   }
-
   if (isError) {
     return (
       <div className="min-h-screen bg-gray-100 p-8 flex items-center justify-center">
@@ -24,25 +60,24 @@ const Provinces = () => {
   const provinces = data?.data || [];
 
   return (
-    <div className="h-screen w-full bg-gray-100 flex flex-col">
-      <div className="flex-1 p-4 md:p-8 w-full overflow-hidden flex flex-col">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">
-            Province Management
-          </h1>
-          <p className="text-gray-600 mt-2">Add and view provinces</p>
-        </div>
+    <div className="flex flex-col h-screen w-full bg-gray-100 overflow-auto">
+      {/* Header */}
+      <div className="p-4 md:p-8 pb-4">
+        <h1 className="text-3xl font-bold text-gray-800">
+          Province Management
+        </h1>
+        <p className="text-gray-600 mt-2">Add and view provinces</p>
+      </div>
 
-        {/* Main Content Area - Grid grows to fill space */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 flex-1 overflow-hidden">
-          {/* Add Province Form */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-6">
-                Add Province
-              </h2>
-              <form className="space-y-4">
+      {/* Add Province Form*/}
+      <div className="px-4 md:px-8 pb-4">
+        <div className="bg-white rounded-lg shadow-md p-6 max-w-2xl">
+          <h2 className="text-xl font-semibold text-gray-800 mb-6">
+            Add Province
+          </h2>
+          <form onSubmit={handleSubmit}>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Province Name
@@ -50,94 +85,87 @@ const Provinces = () => {
                   <input
                     type="text"
                     name="province_name"
+                    id="province_name"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter province name"
+                    value={formData.province_name || ""}
+                    onChange={handleChange}
                   />
                 </div>
+              </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    District ID
-                  </label>
-                  <input
-                    type="number"
-                    name="district_id"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter district ID"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200"
-                >
-                  Add Province
-                </button>
-              </form>
+              <button
+                type="submit"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition duration-200"
+              >
+                Add Province
+              </button>
             </div>
+          </form>
+        </div>
+      </div>
+
+      {/* Province Table - Full Width */}
+      <div className="px-4 md:px-8 pb-8 flex-1 min-h-0">
+        <div className="bg-white rounded-lg shadow-md overflow-hidden h-full flex flex-col">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-800">
+              Provinces List
+            </h2>
           </div>
-
-          {/* Province Table */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h2 className="text-xl font-semibold text-gray-800">
-                  Provinces List
-                </h2>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                        Province ID
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                        Province Name
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                        District ID
-                      </th>
+          <div className="overflow-auto flex-1">
+            <table className="w-full">
+              <thead className="bg-gray-50 sticky top-0">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                    Province ID
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                    Province Name
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                    Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {provinces.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan="2"
+                      className="px-6 py-8 text-center text-gray-500"
+                    >
+                      No provinces found
+                    </td>
+                  </tr>
+                ) : (
+                  provinces.map((province) => (
+                    <tr key={province.province_id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {province.province_id}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {province.province_name}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <button
+                          onClick={() => handleDelete(province.province_id)}
+                          className="space-x-4"
+                        >
+                          Delete
+                        </button>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {provinces.length === 0 ? (
-                      <tr>
-                        <td
-                          colSpan="3"
-                          className="px-6 py-8 text-center text-gray-500"
-                        >
-                          No provinces found
-                        </td>
-                      </tr>
-                    ) : (
-                      provinces.map((province) => (
-                        <tr
-                          key={province.province_id}
-                          className="hover:bg-gray-50"
-                        >
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {province.province_id}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {province.province_name}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {province.district_id}
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-              <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
-                <p className="text-sm text-gray-600">
-                  Total Provinces:{" "}
-                  <span className="font-semibold">{provinces.length}</span>
-                </p>
-              </div>
-            </div>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+            <p className="text-sm text-gray-600">
+              Total Provinces:{" "}
+              <span className="font-semibold">{provinces.length}</span>
+            </p>
           </div>
         </div>
       </div>

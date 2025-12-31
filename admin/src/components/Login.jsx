@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Input from "./shared/Input";
 import { useLoginMutation } from "../redux/features/authSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { setUser } from "../redux/features/authState";
@@ -9,10 +9,17 @@ import { setUser } from "../redux/features/authState";
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const isAuth = useSelector((state) => state.user.isAuth);
   const [login] = useLoginMutation();
   const [formData, setFormData] = useState({ email: "", password: "" });
 
-  const handleClick = (e) => {
+  useEffect(() => {
+    if (isAuth) {
+      navigate("/admin/dashboard");
+    }
+  });
+
+  const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -54,7 +61,7 @@ const Login = () => {
             value={formData.email}
             autoComplete="off"
             required
-            onChange={handleClick}
+            onChange={handleChange}
           />
 
           <Input
@@ -65,7 +72,7 @@ const Login = () => {
             value={formData.password}
             autoComplete="off"
             required
-            onChange={handleClick}
+            onChange={handleChange}
           />
           <button
             type="submit"

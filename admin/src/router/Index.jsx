@@ -3,6 +3,7 @@ import AdminLayout from "../layout/AdminLayout";
 import { adminRoutes } from "./AdminRoutes";
 import Notfound from "../components/shared/PageNotFound";
 import Login from "../components/Login";
+import { Guard } from "./Guard";
 
 export const router = createBrowserRouter([
   {
@@ -15,7 +16,11 @@ export const router = createBrowserRouter([
   },
   {
     path: "/admin",
-    element: <AdminLayout />,
+    element: (
+      <Guard>
+        <AdminLayout />,
+      </Guard>
+    ),
     children: adminRoutes,
   },
 ]);

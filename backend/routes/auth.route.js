@@ -11,7 +11,7 @@ import { authorizeRoles } from "../middleware/isAuthorized.js";
 const authRouter = express.Router();
 
 authRouter.post("/login", login);
-authRouter.post("/signout", isLogin, signOut);
+authRouter.post("/signout", signOut);
 authRouter.post(
   "/addbranchmanager",
   isLogin,
