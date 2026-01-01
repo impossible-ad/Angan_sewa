@@ -9,7 +9,27 @@ export const districtAPIs = indexSlice.injectEndpoints({
       }),
       providesTags: ["district"],
     }),
+
+    addDistrict: builder.mutation({
+      query: (newDistrict) => ({
+        url: "/branch/adddistrict",
+        method: "POST",
+        body: newDistrict,
+      }),
+      invalidatesTags: ["district"],
+    }),
+    deleteDistrict: builder.mutation({
+      query: (district_id) => ({
+        url: `/branch/deletedistrict/${district_id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["district"],
+    }),
   }),
 });
 
-export const { useGetAllDistrictsQuery } = districtAPIs;
+export const {
+  useGetAllDistrictsQuery,
+  useAddDistrictMutation,
+  useDeleteDistrictMutation,
+} = districtAPIs;

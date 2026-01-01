@@ -14,6 +14,9 @@ const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
 
   useEffect(() => {
+    if (!isAuth) {
+      navigate("/");
+    }
     if (isAuth) {
       navigate("/admin/dashboard");
     }

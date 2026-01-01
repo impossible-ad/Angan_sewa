@@ -79,9 +79,22 @@ export const deleteProvince = async (req, res, next) => {
         message: "province doesnot exists",
       });
     }
+    const [rows] = await db.execute(
+      "SELECT COUNT(*) as district_count FROM district where province_id=?",
+      [province_id]
+    );
+    const districtCount = rows[0].district_count;
+    console.log(districtCount);
+    if (districtCount > 0) {
+      return res.status(403).json({
+        message: "Cannot delete province which have valid district",
+      });
+    }
+
     await db.execute("Delete from province where province_id=?", [province_id]);
     return res.status(200).json({
       message: "province successfully deleted",
+      data: districtCount,
     });
   } catch (error) {
     next(error);
@@ -137,11 +150,12 @@ export const getAllDistrict = async (req, res, next) => {
     const [resultD] = await db.execute(`SELECT 
       d.district_id,
       d.district_name,
+      p.province_name,
       GROUP_CONCAT(b.branch_name) as branches 
        FROM district d
-       LEFT JOIN branch b
-       ON d.district_id = b.district_id
-       GROUP BY d.district_id, d.district_name`);
+       LEFT JOIN branch b ON d.district_id = b.district_id
+       LEFT JOIN province p ON d.province_id = p.province_id
+       GROUP BY d.district_id, d.district_name,province_name`);
 
     return res.status(200).json({
       message: "successfully retrieved all district's data",
@@ -162,6 +176,16 @@ export const deleteDistrict = async (req, res, next) => {
     if (inputtedDid.length == 0) {
       return res.status(403).json({
         message: "district doesnot exists",
+      });
+    }
+    const [rows] = await db.execute(
+      "SELECT COUNT(*) as branch_count FROM branch where district_id=?",
+      [district_id]
+    );
+    const branchCount = rows[0].branch_count;
+    if (branchCount > 0) {
+      return res.status(403).json({
+        message: "Cannot delete district which have valid branch",
       });
     }
 

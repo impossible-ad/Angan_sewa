@@ -1,5 +1,5 @@
-import Dashboard from "../components/Dashboard";
 import BranchManagement from "../components/pages/BranchManagement";
+import Dashboard from "../components/pages/Dashboard";
 import Districts from "../components/pages/Districts";
 import Profile from "../components/pages/Profile";
 import Provinces from "../components/pages/Provinces";

@@ -6,6 +6,7 @@ import {
 } from "../../redux/features/provinceSlice";
 import { useState } from "react";
 import Loading from "../shared/IsLoading";
+import Select from "../shared/Select";
 
 const Provinces = () => {
   const { data, isLoading, isError, error } = useGetAllProvincesQuery();
@@ -15,13 +16,23 @@ const Provinces = () => {
     province_name: "",
   });
 
+  const actionOptions = [
+    { value: "view", label: "View" },
+    { value: "delete", label: "Delete" },
+  ];
+
   const handleDelete = async (province_id) => {
+    if (!window.confirm("Are you sure you want to delete this province?"))
+      return;
     try {
       await deleteProvince(province_id).unwrap();
       toast.success("Province deleted successfully");
     } catch (error) {
       toast.error(error.data?.message || "failed to delete province");
     }
+  };
+  const actions = {
+    delete: handleDelete,
   };
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -148,12 +159,11 @@ const Provinces = () => {
                         {province.province_name}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        <button
-                          onClick={() => handleDelete(province.province_id)}
-                          className="space-x-4"
-                        >
-                          Delete
-                        </button>
+                        <Select
+                          options={actionOptions}
+                          actions={actions}
+                          itemId={province.province_id}
+                        />
                       </td>
                     </tr>
                   ))
