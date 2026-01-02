@@ -1,4 +1,5 @@
 import BranchManagement from "../components/pages/BranchManagement";
+import BranchManager from "../components/pages/BranchManager";
 import Dashboard from "../components/pages/Dashboard";
 import Districts from "../components/pages/Districts";
 import Profile from "../components/pages/Profile";
@@ -24,5 +25,9 @@ export const adminRoutes = [
   {
     path: "branchmanagement",
     element: <BranchManagement />,
+  },
+  {
+    path: "branchmanager",
+    element: <BranchManager />,
   },
 ];

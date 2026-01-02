@@ -12,6 +12,7 @@ const Sidebar = () => {
     { name: "Province", path: "/admin/province" },
     { name: "District", path: "/admin/district" },
     { name: "Branch Management", path: "/admin/branchmanagement" },
+    { name: "Branch Manager", path: "/admin/branchmanager" },
   ];
 
   const [signOut] = useSignoutMutation();

@@ -183,3 +183,19 @@ export const editBM = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getBManager = async (req, res, next) => {
+  try {
+    const [result] = await db.execute(
+      `SELECT u.id, u.name, u.email, u.role, b.branch_name
+       FROM users u 
+       INNER JOIN branch b ON u.branch_id = b.branch_id`
+    );
+    return res.status(200).json({
+      message: "successfully fetched",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

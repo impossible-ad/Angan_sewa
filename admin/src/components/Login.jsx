@@ -20,7 +20,7 @@ const Login = () => {
     if (isAuth) {
       navigate("/admin/dashboard");
     }
-  });
+  }, [isAuth, navigate]);
 
   const handleChange = (e) => {
     const { id, value } = e.target;

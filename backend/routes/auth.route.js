@@ -3,6 +3,7 @@ import {
   addBManager,
   deleteBManager,
   editBM,
+  getBManager,
   login,
   signOut,
 } from "../controller/auth.controller.js";
@@ -29,6 +30,12 @@ authRouter.patch(
   isLogin,
   authorizeRoles("admin"),
   editBM
+);
+authRouter.get(
+  "/getbranchmanager",
+  isLogin,
+  authorizeRoles("admin"),
+  getBManager
 );
 
 export default authRouter;

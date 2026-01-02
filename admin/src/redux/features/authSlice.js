@@ -18,7 +18,16 @@ export const authAPIs = indexSlice.injectEndpoints({
       }),
       invalidatesTags: ["auth"],
     }),
+
+    getBManager: builder.query({
+      query: () => ({
+        url: "/auth/getbranchmanager",
+        method: "GET",
+      }),
+      providesTags: ["auth"],
+    }),
   }),
 });
 
-export const { useLoginMutation, useSignoutMutation } = authAPIs;
+export const { useLoginMutation, useSignoutMutation, useGetBManagerQuery } =
+  authAPIs;

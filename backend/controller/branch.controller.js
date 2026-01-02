@@ -247,11 +247,13 @@ export const getAllBranch = async (req, res, next) => {
       `SELECT 
       b.branch_id,
       b.branch_name,
+      b.remarks,
+      d.district_name,
       GROUP_CONCAT(s.name) as services
       FROM branch b
-      LEFT JOIN services s
-      ON b.branch_id = s.branch_id
-      GROUP BY b.branch_id,b.branch_id `
+      LEFT JOIN services s ON b.branch_id = s.branch_id
+      LEFT JOIN district d ON b.district_id = d.district_id
+      GROUP BY b.branch_id,b.branch_id,b.remarks,d.district_name `
     );
     return res.status(200).json({
       message: "Successfully retrieved all  branch data",
