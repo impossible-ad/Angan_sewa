@@ -96,7 +96,7 @@ export const addBManager = async (req, res, next) => {
   const { name, email, password, branch_id } = req.body;
   try {
     if (!name || !email || !password || !branch_id) {
-      return res.status(404).json({
+      return res.status(403).json({
         message: "pleasse provide all details",
       });
     }

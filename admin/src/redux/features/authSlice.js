@@ -26,8 +26,37 @@ export const authAPIs = indexSlice.injectEndpoints({
       }),
       providesTags: ["auth"],
     }),
+
+    addBManager: builder.mutation({
+      query: (data) => ({
+        url: "/auth/addbranchmanager",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["auth"],
+    }),
+    deletebManager: builder.mutation({
+      query: (id) => ({
+        url: `/auth/deletebranchmanager/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["auth"],
+    }),
+    editbManager: builder.mutation({
+      query: (id) => ({
+        url: `/auth/editbranchmanager/${id}`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["auth"],
+    }),
   }),
 });
 
-export const { useLoginMutation, useSignoutMutation, useGetBManagerQuery } =
-  authAPIs;
+export const {
+  useLoginMutation,
+  useSignoutMutation,
+  useGetBManagerQuery,
+  useAddBManagerMutation,
+  useDeletebManagerMutation,
+  useEditbManagerMutation,
+} = authAPIs;

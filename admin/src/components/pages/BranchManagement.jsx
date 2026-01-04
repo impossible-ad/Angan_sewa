@@ -86,11 +86,7 @@ const BranchManagement = () => {
         <h1 className="text-3xl font-bold text-gray-800">Branch Management</h1>
         <p className="text-gray-600 mt-2">Manage branches</p>
       </div>
-      <div className="px-4 md:px-8 pb-4">
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold text-gray-800">Add Branch</h2>
-        </div>
-      </div>
+
       {/* Add Branch Form */}
       <div className="px-4 md:px-8 pb-4">
         <div className="bg-white rounded-lg shadow-md p-6">
