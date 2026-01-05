@@ -34,6 +34,12 @@ const BranchManagement = () => {
       [id]: value,
     }));
   };
+  const handleActionChange = (e, branch_id) => {
+    if (e.target.value === "delete") {
+      handleDelete(branch_id);
+    }
+    e.target.value = "";
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -63,7 +69,6 @@ const BranchManagement = () => {
     }
   };
   const actionOptions = [{ label: "Delete", value: "delete" }];
-  const action = { delete: handleDelete };
 
   if (isError) {
     return (
@@ -211,8 +216,9 @@ const BranchManagement = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         <Select
                           options={actionOptions}
-                          actions={action}
-                          itemId={branch.branch_id}
+                          onChange={(e) => {
+                            handleActionChange(e, branch.branch_id);
+                          }}
                         />
                       </td>
                     </tr>

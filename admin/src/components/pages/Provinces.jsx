@@ -20,6 +20,12 @@ const Provinces = () => {
     { value: "view", label: "View" },
     { value: "delete", label: "Delete" },
   ];
+  const handleActionChange = (e, province_id) => {
+    if (e.target.value === "delete") {
+      handleDelete(province_id);
+    }
+    e.target.value = "";
+  };
 
   const handleDelete = async (province_id) => {
     if (!window.confirm("Are you sure you want to delete this province?"))
@@ -31,9 +37,7 @@ const Provinces = () => {
       toast.error(error.data?.message || "failed to delete province");
     }
   };
-  const actions = {
-    delete: handleDelete,
-  };
+
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData({ ...formData, [id]: value });
@@ -161,8 +165,9 @@ const Provinces = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         <Select
                           options={actionOptions}
-                          actions={actions}
-                          itemId={province.province_id}
+                          onChange={(e) => {
+                            handleActionChange(e, province.province_id);
+                          }}
                         />
                       </td>
                     </tr>

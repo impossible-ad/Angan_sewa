@@ -34,6 +34,12 @@ const Districts = () => {
       label: "Delete",
     },
   ];
+  const handleActionChange = (e, district_id) => {
+    if (e.target.value === "delete") {
+      handleDelete(district_id);
+    }
+    e.target.value = "";
+  };
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -62,7 +68,6 @@ const Districts = () => {
       toast.error(error.data?.message || "Failed to delete district");
     }
   };
-  const action = { delete: handleDelete };
 
   if (disLoading || provLoading) {
     return <Loading loading={disLoading || provLoading} />;
@@ -196,8 +201,9 @@ const Districts = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         <Select
                           options={actionOptions}
-                          actions={action}
-                          itemId={district.district_id}
+                          onChange={(e) => {
+                            handleActionChange(e, district.district_id);
+                          }}
                         />
                       </td>
                     </tr>

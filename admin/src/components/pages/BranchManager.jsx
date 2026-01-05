@@ -2,12 +2,16 @@ import { useState } from "react";
 import {
   useAddBManagerMutation,
   useDeletebManagerMutation,
+  useEditbManagerMutation,
+  useGetAllPDBQuery,
   useGetBManagerQuery,
 } from "../../redux/features/authSlice";
 import Loading from "../shared/IsLoading";
 import { toast } from "react-toastify";
 import { useGetAllBranchsQuery } from "../../redux/features/branchSlice";
 import Select from "../shared/Select";
+import DetailsModal from "../shared/Modal";
+import Input from "../shared/Input";
 
 const BranchManager = () => {
   const {
@@ -19,6 +23,19 @@ const BranchManager = () => {
   const { data: branch, isLoading: branchLoading } = useGetAllBranchsQuery();
   const [addBManager] = useAddBManagerMutation();
   const [deleteBManager] = useDeletebManagerMutation();
+  const [editBManager] = useEditbManagerMutation();
+  const [province_id, setProvinceId] = useState("");
+  const [district_id, setDistrictId] = useState("");
+  const { data: pdb, isLoading: pdbLoading } = useGetAllPDBQuery({
+    province_id,
+    district_id,
+  });
+  const [editData, setEditData] = useState({
+    email: "",
+    password: "",
+  });
+  const [editModal, setEditModal] = useState(false);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -32,6 +49,19 @@ const BranchManager = () => {
       [id]: value,
     }));
   };
+
+  const handleActionChange = (e, manager) => {
+    if (e.target.value === "edit") {
+      setEditModal(true);
+      setEditData({
+        email: manager.email,
+      });
+    } else if (e.target.value === "delete") {
+      handleDelete(manager.id);
+    }
+    e.target.value = "";
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -62,15 +92,21 @@ const BranchManager = () => {
         !window.confirm("Are you sure you want to delete this branch manager?")
       )
         return;
-
       const res = await deleteBManager(id).unwrap();
       toast.success(res.message || "branch manager deleted successfully");
     } catch (error) {
       toast.error(error.data?.message || "failed to delete branch manager");
     }
   };
+
   const handleEdit = async (id) => {
-    toast.info(`Edit functionality for ID ${id} is not implemented yet.`);
+    setEditModal(true);
+    try {
+      await editBManager(editData).unwrap();
+      toast.success("branch manager edited successfully");
+    } catch (error) {
+      toast.error("failed to edit branch manager");
+    }
   };
   if (isError) {
     return (
@@ -81,23 +117,25 @@ const BranchManager = () => {
       </div>
     );
   }
-  if (bManagerLoading || branchLoading) {
-    return <Loading loading={bManagerLoading || branchLoading} />;
+  if (bManagerLoading || branchLoading || pdbLoading) {
+    return <Loading loading={bManagerLoading || branchLoading || pdbLoading} />;
   }
   const actionOptions = [
     { label: "Delete", value: "delete" },
     { label: "Edit", value: "edit" },
   ];
-  const action = [{ delete: handleDelete }, { edit: handleEdit }];
   const branches = branch?.data || [];
   const bManager = branchManager?.data || [];
+  const pdbData = pdb?.data || [];
+
   return (
     <div className="flex flex-col h-screen w-full bg-gray-100 overflow-auto">
       {/* Header */}
-      <div className="p-4 md:p-8 pb-4">
+      <div className="p-4 md:p-8 pb-4  ">
         <h1 className="text-3xl font-bold text-gray-800">Branch Manager</h1>
         <p className="text-gray-600 mt-2">Manage your branch managers</p>
       </div>
+
       {/* Add Branch Manager Form */}
       <div className="px-4 md:px-8 pb-4">
         <div className="bg-white rounded-lg shadow-md p-6">
@@ -106,7 +144,65 @@ const BranchManager = () => {
           </h2>
           <form onSubmit={handleSubmit}>
             <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Select Province
+                  </label>
+                  <select
+                    id="province_id"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
+                    value={province_id}
+                    onChange={(e) => setProvinceId(e.target.value)}
+                  >
+                    <option value="">-- Choose Province --</option>
+                    {(pdbData?.provinces || []).map((province) => (
+                      <option
+                        key={province.province_id}
+                        value={province.province_id}
+                      >
+                        {province.province_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Select District
+                  </label>
+                  <select
+                    id="district_id"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
+                    value={district_id}
+                    onChange={(e) => setDistrictId(e.target.value)}
+                  >
+                    <option value="">-- Choose District --</option>
+                    {branches.map((branch) => (
+                      <option key={branch.branch_id} value={branch.branch_id}>
+                        {branch.branch_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Select Branch
+                  </label>
+                  <select
+                    id="branch_id"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
+                    value={formData.branch_id}
+                    onChange={handleChange}
+                  >
+                    <option value="">-- Choose Branch --</option>
+                    {branches.map((branch) => (
+                      <option key={branch.branch_id} value={branch.branch_id}>
+                        {branch.branch_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Branch Manager Name
@@ -150,25 +246,6 @@ const BranchManager = () => {
                     value={formData.password || ""}
                     onChange={handleChange}
                   />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Select Branch
-                  </label>
-                  <select
-                    id="branch_id"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
-                    value={formData.branch_id}
-                    onChange={handleChange}
-                  >
-                    <option value="">-- Choose Branch --</option>
-                    {branches.map((branch) => (
-                      <option key={branch.branch_id} value={branch.branch_id}>
-                        {branch.branch_name}
-                      </option>
-                    ))}
-                  </select>
                 </div>
               </div>
 
@@ -239,8 +316,9 @@ const BranchManager = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         <Select
                           options={actionOptions}
-                          actions={action}
-                          itemId={manager.id}
+                          onChange={(e) => {
+                            handleActionChange(e, manager);
+                          }}
                         />
                       </td>
                     </tr>
@@ -257,6 +335,42 @@ const BranchManager = () => {
           </div>
         </div>
       </div>
+      <DetailsModal
+        show={editModal}
+        onClose={() => setEditModal(false)}
+        title="Edit Branch Manager"
+        size="lg"
+      >
+        <form onSubmit={handleEdit} className="flex flex-col w-full gap-5">
+          <Input
+            label="Email"
+            type="text"
+            placeholder="Enter the email"
+            id="email"
+            value={editData.email}
+            autoComplete="off"
+            required
+            onChange={handleChange}
+          />
+
+          <Input
+            label="Password"
+            type="password"
+            placeholder="Enter the password"
+            id="password"
+            value={editData.password}
+            autoComplete="off"
+            required
+            onChange={handleChange}
+          />
+          <button
+            type="submit"
+            className="bg-blue-600 text-white p-2 rounded-lg mt-3"
+          >
+            Edit
+          </button>
+        </form>
+      </DetailsModal>
     </div>
   );
 };

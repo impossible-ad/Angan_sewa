@@ -85,8 +85,9 @@ export const editService = async (req, res, next) => {
     }
 
     await db.execute(
-      "INSERT INTO services(name,description,address,img) VALUES(?,?,?,?)",
-      [name, description, address, img]
+      "UPDATE services SET name=?, description=?, address=?, img=? WHERE service_id=?",
+
+      [name, description, address, img, service_id]
     );
 
     return res.status(200).json({

@@ -3,6 +3,7 @@ import {
   addBManager,
   deleteBManager,
   editBM,
+  getAllPDB,
   getBManager,
   login,
   signOut,
@@ -37,5 +38,6 @@ authRouter.get(
   authorizeRoles("admin"),
   getBManager
 );
+authRouter.get("/getallpdb", isLogin, authorizeRoles("admin"), getAllPDB);
 
 export default authRouter;

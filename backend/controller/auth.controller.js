@@ -148,10 +148,9 @@ export const editBM = async (req, res, next) => {
   const { id } = req.params;
   const { name, role, email, password } = req.body;
   try {
-    const [existsE] = await db.execute(
-      "SELECT email from users where email=?",
-      [email]
-    );
+    const [existsE] = await db.execute("SELECT email from users where id=?", [
+      id,
+    ]);
     if (existsE.length > 0) {
       return res.status(402).json({
         message: "email already in use",
@@ -196,6 +195,41 @@ export const getBManager = async (req, res, next) => {
       data: result,
     });
   } catch (error) {
+    next(error);
+  }
+};
+export const getAllPDB = async (req, res, next) => {
+  const { province_id, district_id, branch_id } = req.params;
+  try {
+    let query = `SELECT 
+      p.province_id,
+      p.province_name,
+      d.district_name,
+      d.district_id,
+      b.branch_id,
+      b.branch_name
+      FROM province p
+      LEFT JOIN district d ON p.province_id = d.province_id
+      LEFT JOIN branch b ON d.district_id = b.district_id
+      WHERE 1=1`;
+    let queryParams = [];
+
+    if (province_id) {
+      query += ` AND p.province_id = ?`;
+      queryParams.push(parseInt(province_id));
+    }
+    if (district_id) {
+      query += ` AND d.district_id = ?`;
+      queryParams.push(parseInt(district_id));
+    }
+
+    const [result] = await db.execute(query, queryParams);
+    return res.status(200).json({
+      message: "Successfully retrieved all  P>D>B data",
+      data: result,
+    });
+  } catch (error) {
+    console.log(error);
     next(error);
   }
 };

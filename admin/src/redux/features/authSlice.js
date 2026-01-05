@@ -49,6 +49,15 @@ export const authAPIs = indexSlice.injectEndpoints({
       }),
       invalidatesTags: ["auth"],
     }),
+    getAllPDB: builder.query({
+      query: ({ province_id, district_id } = {}) => ({
+        url: `/auth/getallpdb/?${
+          province_id ? `province_id=${province_id}` : ""
+        }${district_id ? `&district_id=${district_id}` : ""}`,
+        method: "GET",
+      }),
+      providesTags: ["auth"],
+    }),
   }),
 });
 
@@ -59,4 +68,5 @@ export const {
   useAddBManagerMutation,
   useDeletebManagerMutation,
   useEditbManagerMutation,
+  useGetAllPDBQuery,
 } = authAPIs;
