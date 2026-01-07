@@ -198,38 +198,67 @@ export const getBManager = async (req, res, next) => {
     next(error);
   }
 };
-export const getAllPDB = async (req, res, next) => {
-  const { province_id, district_id, branch_id } = req.params;
+// export const getAllPDB = async (req, res, next) => {
+//   const { province_id, district_id } = req.query;
+//   try {
+//     let query = `SELECT
+//       p.province_id,
+//       p.province_name,
+//       GROUP_CONCAT(DISTINCT CONCAT(d.district_name, ':',d.district_id ,':', d.province_id)) AS districts,
+//       GROUP_CONCAT(DISTINCT CONCAT(b.branch_name, ':',b.branch_id, ':',b.district_id )) AS branches
+//       FROM province p
+//       LEFT JOIN district d ON p.province_id = d.province_id
+//       LEFT JOIN branch b ON d.district_id = b.district_id
+//       WHERE 1=1`;
+//     let queryParams = [];
+
+//     if (province_id) {
+//       query += ` AND p.province_id = ?`;
+//       queryParams.push(parseInt(province_id));
+//     }
+//     if (district_id) {
+//       query += ` AND d.district_id = ?`;
+//       queryParams.push(parseInt(district_id));
+//     }
+//     query += ` GROUP BY p.province_id, p.province_name`;
+
+//     const [result] = await db.execute(query, queryParams);
+//     return res.status(200).json({
+//       message: "Successfully retrieved all  P>D>B data",
+//       data: result,
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     next(error);
+//   }
+// };
+
+export const getAllPDB = async (req, res) => {
+  const { province_id, district_id } = req.query;
   try {
-    let query = `SELECT 
-      p.province_id,
-      p.province_name,
-      d.district_name,
-      d.district_id,
-      b.branch_id,
-      b.branch_name
-      FROM province p
-      LEFT JOIN district d ON p.province_id = d.province_id
-      LEFT JOIN branch b ON d.district_id = b.district_id
-      WHERE 1=1`;
-    let queryParams = [];
+    let query = "";
+    let params = [];
 
-    if (province_id) {
-      query += ` AND p.province_id = ?`;
-      queryParams.push(parseInt(province_id));
+    if (province_id && !district_id) {
+      // Get districts based on province_id
+      query = "SELECT * FROM district WHERE province_id = ?";
+      params = [province_id];
+    } else if (district_id) {
+      // Get branches based on district_id
+      query = "SELECT * FROM branch WHERE district_id = ?";
+      params = [district_id];
+    } else {
+      return res
+        .status(400)
+        .json({ message: "Please provide province_id or district_id" });
     }
-    if (district_id) {
-      query += ` AND d.district_id = ?`;
-      queryParams.push(parseInt(district_id));
-    }
+    const [results] = await db.query(query, params);
 
-    const [result] = await db.execute(query, queryParams);
-    return res.status(200).json({
-      message: "Successfully retrieved all  P>D>B data",
-      data: result,
+    res.status(200).json({
+      message: "Data fetched successfully",
+      data: results,
     });
   } catch (error) {
-    console.log(error);
-    next(error);
+    res.status(500).json({ message: "Server error" });
   }
 };

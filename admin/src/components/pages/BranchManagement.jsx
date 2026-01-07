@@ -83,7 +83,11 @@ const BranchManagement = () => {
     return <Loading loading={branchLoading} />;
   }
   const branch = branchData?.data || [];
-  const district = districtData?.data || [];
+  const districtOptions =
+    districtData?.data.map((dist) => ({
+      value: dist.district_id,
+      label: dist.district_name,
+    })) || [];
   return (
     <div className="flex flex-col h-screen w-full bg-gray-100 overflow-auto">
       {/* Header */}
@@ -121,19 +125,13 @@ const BranchManagement = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Select district
                   </label>
-                  <select
+                  <Select
                     id="district_id"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
                     value={formData.district_id}
+                    options={districtOptions}
                     onChange={handleChange}
-                  >
-                    <option value="">-- Choose District --</option>
-                    {district.map((dist) => (
-                      <option key={dist.district_id} value={dist.district_id}>
-                        {dist.district_name}
-                      </option>
-                    ))}
-                  </select>
+                    className="w-full "
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">

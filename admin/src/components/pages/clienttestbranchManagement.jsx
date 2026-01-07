@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   useAddBManagerMutation,
   useDeletebManagerMutation,
@@ -14,7 +14,7 @@ import DetailsModal from "../shared/Modal";
 import Input from "../shared/Input";
 import { useGetAllProvincesQuery } from "../../redux/features/provinceSlice";
 
-const BranchManager = () => {
+const ClientTestBranchManagement = () => {
   const {
     data: branchManager,
     isLoading: bManagerLoading,
@@ -29,16 +29,18 @@ const BranchManager = () => {
   const [district_id, setDistrictId] = useState("");
   const { data: province, isLoading: provLoading } = useGetAllProvincesQuery();
 
-  const { data: pdb, isLoading: pdbLoading } = useGetAllPDBQuery(
-    {
-      province_id,
-      district_id,
-    }
-    //   {
-    //     skip: !province_id, // Only fetch when province is selected
-    //condition to prevent API calls when no province is selected
-    //   }
+  // Get districts when province is selected
+  const { data: districts, isLoading: districtLoading } = useGetAllPDBQuery(
+    { province_id },
+    { skip: !province_id }
   );
+
+  // Get branches when district is selected
+  const { data: branches, isLoading: branchLoading } = useGetAllPDBQuery(
+    { district_id },
+    { skip: !district_id }
+  );
+
   const [editData, setEditData] = useState({
     email: "",
     password: "",
@@ -51,11 +53,6 @@ const BranchManager = () => {
     password: "",
     branch_id: "",
   });
-  // Reset district_id when province changes
-  // useEffect(() => {
-  //   setDistrictId("");
-  // }, [province_id]);
-  // solved by resetting district_id while onChange of Province ,does it synchronously
 
   const handleChange = async (e) => {
     const { id, value } = e.target;
@@ -123,6 +120,7 @@ const BranchManager = () => {
       toast.error("failed to edit branch manager");
     }
   };
+
   if (isError) {
     return (
       <div className="min-h-screen bg-gray-100 p-8 flex items-center justify-center">
@@ -132,56 +130,36 @@ const BranchManager = () => {
       </div>
     );
   }
-  if (bManagerLoading || pdbLoading || provLoading) {
-    return <Loading loading={bManagerLoading || pdbLoading || provLoading} />;
+
+  if (bManagerLoading || provLoading) {
+    return <Loading loading={bManagerLoading || provLoading} />;
   }
+
   const actionOptions = [
     { label: "Delete", value: "delete" },
     { label: "Edit", value: "edit" },
   ];
 
   const bManager = branchManager?.data || [];
-  const provinceOptions =
-    province?.data.map((prov) => ({
-      value: prov.province_id,
-      label: prov.province_name,
-    })) || [];
-  const pdbData = pdb?.data || [];
+  const provinceOptions = province?.data?.map((prov) => ({
+    value: prov.province_id,
+    label: prov.province_name,
+  })) || [];
 
-  // Parse districts and branches from the first province data
-  const firstProvince = pdbData[0] || {};
-  const availableDist = firstProvince.districts
-    ? firstProvince.districts
-        .split(",")
-        .map((item) => {
-          const [district_name, district_id, dprovince_id] = item.split(":");
-          return { district_id, district_name, dprovince_id };
-        })
-        .filter((district) => district.dprovince_id === province_id)
-    : [];
-  const districtOptions = availableDist.map((dist) => ({
+  const districtOptions = districts?.data?.map((dist) => ({
     value: dist.district_id,
     label: dist.district_name,
-  }));
+  })) || [];
 
-  const availableBranch = firstProvince.branches
-    ? firstProvince.branches
-        .split(",")
-        .map((item) => {
-          const [branch_name, branch_id, bdistrict_id] = item.split(":");
-          return { branch_id, branch_name, bdistrict_id };
-        })
-        .filter((branch) => branch.bdistrict_id === district_id)
-    : [];
-
-  const branchOptions = availableBranch.map((branch) => ({
+  const branchOptions = branches?.data?.map((branch) => ({
     value: branch.branch_id,
     label: branch.branch_name,
-  }));
+  })) || [];
+
   return (
     <div className="flex flex-col h-screen w-full bg-gray-100 overflow-auto">
       {/* Header */}
-      <div className="p-4 md:p-8 pb-4  ">
+      <div className="p-4 md:p-8 pb-4">
         <h1 className="text-3xl font-bold text-gray-800">Branch Manager</h1>
         <p className="text-gray-600 mt-2">Manage your branch managers</p>
       </div>
@@ -206,7 +184,7 @@ const BranchManager = () => {
                     options={provinceOptions}
                     onChange={(e) => {
                       setProvinceId(e.target.value);
-                      setDistrictId(""); // Reset district immediately
+                      setDistrictId("");
                     }}
                   />
                 </div>
@@ -216,11 +194,11 @@ const BranchManager = () => {
                   </label>
                   <Select
                     id="district_id"
-                    className="w-full "
+                    className="w-full"
                     value={district_id}
                     options={districtOptions}
                     onChange={(e) => setDistrictId(e.target.value)}
-                    disabled={!province_id}
+                    disabled={!province_id || districtLoading}
                   />
                 </div>
                 <div>
@@ -233,7 +211,7 @@ const BranchManager = () => {
                     value={formData.branch_id}
                     options={branchOptions}
                     onChange={handleChange}
-                    disabled={!district_id}
+                    disabled={!district_id || branchLoading}
                   />
                 </div>
 
@@ -409,4 +387,4 @@ const BranchManager = () => {
   );
 };
 
-export default BranchManager;
+export default ClientTestBranchManagement;

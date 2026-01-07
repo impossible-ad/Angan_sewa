@@ -84,7 +84,11 @@ const Districts = () => {
   }
 
   const district = districtData?.data || [];
-  const province = provinceData?.data || [];
+  const provinceOptions =
+    provinceData?.data.map((prov) => ({
+      value: prov.province_id,
+      label: prov.province_name,
+    })) || [];
 
   return (
     <div className="flex flex-col h-screen w-full bg-gray-100 overflow-auto">
@@ -124,19 +128,13 @@ const Districts = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Select Province
                   </label>
-                  <select
+                  <Select
                     id="province_id"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
                     value={formData.province_id}
+                    options={provinceOptions}
                     onChange={handleChange}
-                  >
-                    <option value="">-- Choose Province --</option>
-                    {province.map((prov) => (
-                      <option key={prov.province_id} value={prov.province_id}>
-                        {prov.province_name}
-                      </option>
-                    ))}
-                  </select>
+                    className="w-full "
+                  />
                 </div>
               </div>
 
@@ -225,3 +223,15 @@ const Districts = () => {
 };
 
 export default Districts;
+
+//                    id="province_id"
+//                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
+//                   value={formData.province_id}
+//                   onChange={handleChange}
+//                 >
+//                   <option value="">-- Choose Province --</option>
+//                   {province.map((prov) => (
+//                     <option key={prov.province_id} value={prov.province_id}>
+//                       {prov.province_name}
+//                     </option>
+//                   ))}
