@@ -1,19 +1,19 @@
 const Input = ({
   label,
-  type = "text",
+  type,
   placeholder,
   id,
   required = false,
   value,
   onChange,
+  className,
 }) => {
   return (
-    <label className="flex flex-col text-left">
-      <span>
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-2">
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
-      </span>
-
+      </label>
       <input
         type={type}
         placeholder={placeholder}
@@ -21,9 +21,9 @@ const Input = ({
         required={required}
         value={value}
         onChange={onChange}
-        className="border p-2 rounded"
+        className={`${className}  border p-2 rounded`}
       />
-    </label>
+    </div>
   );
 };
 

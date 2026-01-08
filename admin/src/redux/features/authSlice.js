@@ -58,15 +58,12 @@ export const authAPIs = indexSlice.injectEndpoints({
       }),
       providesTags: ["auth"],
     }),
-    
-    getAllPDM: builder.query({
-      query: ({ province_id, district_id } = {}) => ({
-        url: `/auth/getallpdm/?${
-          province_id ? `province_id=${province_id}` : ""
-        }${district_id ? `&district_id=${district_id}` : ""}`,
+    verifyToken: builder.query({
+      query: () => ({
+        url: "/auth/verifytoken",
         method: "GET",
       }),
-      providesTags: ["auth"],
+      validatesTags: ["auth"],
     }),
   }),
 });
@@ -79,5 +76,5 @@ export const {
   useDeletebManagerMutation,
   useEditbManagerMutation,
   useGetAllPDBQuery,
-  useGetAllPDMQuery,
+  useVerifyTokenQuery,
 } = authAPIs;

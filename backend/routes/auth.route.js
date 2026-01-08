@@ -7,6 +7,7 @@ import {
   getBManager,
   login,
   signOut,
+  verifyToken,
 } from "../controller/auth.controller.js";
 import { isLogin } from "../middleware/isLogin.js";
 import { authorizeRoles } from "../middleware/isAuthorized.js";
@@ -39,5 +40,7 @@ authRouter.get(
   getBManager
 );
 authRouter.get("/getallpdb", isLogin, authorizeRoles("admin"), getAllPDB);
+
+authRouter.get("/verifytoken", isLogin, verifyToken);
 
 export default authRouter;

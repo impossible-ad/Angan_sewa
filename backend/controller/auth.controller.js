@@ -73,7 +73,6 @@ export const login = async (req, res, next) => {
         role: user.role,
         branch: user.branch_name,
         branch_id: user.branch_id,
-        token: token,
       },
     });
   } catch (error) {
@@ -228,7 +227,7 @@ export const getBManager = async (req, res, next) => {
 //       data: result,
 //     });
 //   } catch (error) {
-//     console.log(error);
+//
 //     next(error);
 //   }
 // };
@@ -259,6 +258,30 @@ export const getAllPDB = async (req, res) => {
       data: results,
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    next(error);
+  }
+};
+
+export const verifyToken = async (req, res, next) => {
+  try {
+    const token = req.cookies.token;
+
+    if (!token) {
+      return res.status(401).json({ message: "No token provided" });
+    }
+
+    jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
+      if (err) {
+        res.clearCookie("token");
+        return res.status(401).json({ message: "Token expired or invalid" });
+      }
+
+      res.status(200).json({
+        message: "Token is valid",
+        user: decoded,
+      });
+    });
+  } catch (error) {
+    next(error);
   }
 };

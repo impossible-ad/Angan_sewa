@@ -29,15 +29,16 @@ const BranchManager = () => {
   const [district_id, setDistrictId] = useState("");
   const { data: province, isLoading: provLoading } = useGetAllProvincesQuery();
 
-  const { data: pdb, isLoading: pdbLoading } = useGetAllPDBQuery(
-    {
-      province_id,
-      district_id,
-    }
-    //   {
-    //     skip: !province_id, // Only fetch when province is selected
-    //condition to prevent API calls when no province is selected
-    //   }
+  // Get districts when province is selected
+  const { data: districts } = useGetAllPDBQuery(
+    { province_id },
+    { skip: !province_id }
+  );
+
+  // Get branches when district is selected
+  const { data: branches } = useGetAllPDBQuery(
+    { district_id },
+    { skip: !district_id }
   );
   const [editData, setEditData] = useState({
     email: "",
@@ -132,8 +133,8 @@ const BranchManager = () => {
       </div>
     );
   }
-  if (bManagerLoading || pdbLoading || provLoading) {
-    return <Loading loading={bManagerLoading || pdbLoading || provLoading} />;
+  if (bManagerLoading || provLoading) {
+    return <Loading loading={bManagerLoading || provLoading} />;
   }
   const actionOptions = [
     { label: "Delete", value: "delete" },
@@ -146,38 +147,18 @@ const BranchManager = () => {
       value: prov.province_id,
       label: prov.province_name,
     })) || [];
-  const pdbData = pdb?.data || [];
 
-  // Parse districts and branches from the first province data
-  const firstProvince = pdbData[0] || {};
-  const availableDist = firstProvince.districts
-    ? firstProvince.districts
-        .split(",")
-        .map((item) => {
-          const [district_name, district_id, dprovince_id] = item.split(":");
-          return { district_id, district_name, dprovince_id };
-        })
-        .filter((district) => district.dprovince_id === province_id)
-    : [];
-  const districtOptions = availableDist.map((dist) => ({
-    value: dist.district_id,
-    label: dist.district_name,
-  }));
+  const districtOptions =
+    districts?.data.map((dist) => ({
+      value: dist.district_id,
+      label: dist.district_name,
+    })) || [];
 
-  const availableBranch = firstProvince.branches
-    ? firstProvince.branches
-        .split(",")
-        .map((item) => {
-          const [branch_name, branch_id, bdistrict_id] = item.split(":");
-          return { branch_id, branch_name, bdistrict_id };
-        })
-        .filter((branch) => branch.bdistrict_id === district_id)
-    : [];
-
-  const branchOptions = availableBranch.map((branch) => ({
-    value: branch.branch_id,
-    label: branch.branch_name,
-  }));
+  const branchOptions =
+    branches?.data.map((branch) => ({
+      value: branch.branch_id,
+      label: branch.branch_name,
+    })) || [];
   return (
     <div className="flex flex-col h-screen w-full bg-gray-100 overflow-auto">
       {/* Header */}
@@ -193,87 +174,80 @@ const BranchManager = () => {
             Add Branch Manager
           </h2>
           <form onSubmit={handleSubmit}>
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Select Province
-                  </label>
-                  <Select
-                    id="province_id"
-                    className="w-full"
-                    value={province_id}
-                    options={provinceOptions}
-                    onChange={(e) => {
-                      setProvinceId(e.target.value);
-                      setDistrictId(""); // Reset district immediately
-                    }}
-                  />
+            <div className="space-y-6">
+              {/* Location Selection */}
+              <div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Select Province
+                    </label>
+                    <Select
+                      id="province_id"
+                      className="w-full"
+                      value={province_id}
+                      options={provinceOptions}
+                      onChange={(e) => {
+                        setProvinceId(e.target.value);
+                        setDistrictId(""); // Reset district immediately
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Select District
+                    </label>
+                    <Select
+                      id="district_id"
+                      className="w-full "
+                      value={district_id}
+                      options={districtOptions}
+                      onChange={(e) => setDistrictId(e.target.value)}
+                      disabled={!province_id}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Select Branch
+                    </label>
+                    <Select
+                      id="branch_id"
+                      className="w-full"
+                      value={formData.branch_id}
+                      options={branchOptions}
+                      onChange={handleChange}
+                      disabled={!district_id}
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Select District
-                  </label>
-                  <Select
-                    id="district_id"
-                    className="w-full "
-                    value={district_id}
-                    options={districtOptions}
-                    onChange={(e) => setDistrictId(e.target.value)}
-                    disabled={!province_id}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Select Branch
-                  </label>
-                  <Select
-                    id="branch_id"
-                    className="w-full"
-                    value={formData.branch_id}
-                    options={branchOptions}
-                    onChange={handleChange}
-                    disabled={!district_id}
-                  />
-                </div>
+              </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Branch Manager Name
-                  </label>
-                  <input
+              {/* Manager Details */}
+              <div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Input
+                    label="Name"
                     type="text"
-                    name="name"
                     id="name"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter Branch Manager's name"
                     value={formData.name || ""}
                     onChange={handleChange}
                   />
-                </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email
-                  </label>
-                  <input
+                  <Input
+                    label="Email"
                     type="email"
-                    name="email"
                     id="email"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter Branch Manager's email"
                     value={formData.email || ""}
                     onChange={handleChange}
                   />
-                </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Password
-                  </label>
-                  <input
+                  <Input
+                    label="Password"
                     type="password"
-                    name="password"
                     id="password"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter Branch Manager's password"

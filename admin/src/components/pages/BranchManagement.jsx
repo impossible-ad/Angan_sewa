@@ -8,6 +8,7 @@ import Loading from "../shared/IsLoading";
 import Select from "../shared/Select";
 import { useGetAllDistrictsQuery } from "../../redux/features/districtSlice";
 import { useState } from "react";
+import Input from "../shared/Input";
 
 const BranchManagement = () => {
   const {
@@ -21,6 +22,7 @@ const BranchManagement = () => {
   const [addBranch] = useAddBranchMutation();
   const { data: districtData, isLoading: disLoading } =
     useGetAllDistrictsQuery();
+
   const [formData, setFormData] = useState({
     branch_name: "",
     district_id: "",
@@ -79,8 +81,8 @@ const BranchManagement = () => {
       </div>
     );
   }
-  if (branchLoading) {
-    return <Loading loading={branchLoading} />;
+  if (branchLoading || disLoading) {
+    return <Loading loading={branchLoading || disLoading} />;
   }
   const branch = branchData?.data || [];
   const districtOptions =
@@ -105,22 +107,16 @@ const BranchManagement = () => {
           <form onSubmit={handleSubmit}>
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Branch Name
-                  </label>
-                  <input
-                    type="text"
-                    name="branch_name"
-                    id="branch_name"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter branch name"
-                    value={formData.branch_name || ""}
-                    onChange={handleChange}
-                  />
-                </div>
+                <Input
+                  label="Branch Name"
+                  type="text"
+                  id="branch_name"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter branch name"
+                  value={formData.branch_name || ""}
+                  onChange={handleChange}
+                />
 
-                {/* District Dropdown  */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Select district
@@ -133,20 +129,15 @@ const BranchManagement = () => {
                     className="w-full "
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Remarks
-                  </label>
-                  <input
-                    type="text"
-                    name="remarks"
-                    id="remarks"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Add description"
-                    value={formData.remarks || ""}
-                    onChange={handleChange}
-                  />
-                </div>
+                <Input
+                  label="Remarks"
+                  type="text"
+                  id="remarks"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Add description"
+                  value={formData.remarks || ""}
+                  onChange={handleChange}
+                />
               </div>
 
               <button
