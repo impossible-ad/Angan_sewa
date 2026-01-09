@@ -45,6 +45,8 @@ const BranchManager = () => {
     password: "",
   });
   const [editModal, setEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletingManager, setDeletingManager] = useState(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -73,7 +75,8 @@ const BranchManager = () => {
         email: manager.email,
       });
     } else if (e.target.value === "delete") {
-      handleDelete(manager.id);
+      setShowDeleteModal(true);
+      setDeletingManager(manager);
     }
     e.target.value = "";
   };
@@ -102,16 +105,16 @@ const BranchManager = () => {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async () => {
     try {
-      if (
-        !window.confirm("Are you sure you want to delete this branch manager?")
-      )
-        return;
-      const res = await deleteBManager(id).unwrap();
+      const res = await deleteBManager(deletingManager?.id).unwrap();
       toast.success(res.message || "branch manager deleted successfully");
+      setShowDeleteModal(false);
+      setDeletingManager(null);
     } catch (error) {
       toast.error(error.data?.message || "failed to delete branch manager");
+      setShowDeleteModal(false);
+      setDeletingManager(null);
     }
   };
 
@@ -378,6 +381,35 @@ const BranchManager = () => {
             Edit
           </button>
         </form>
+      </DetailsModal>
+      <DetailsModal
+        show={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        size="xl"
+        title="Delete Branch Manager"
+      >
+        <div className="space-y-4">
+          <p className="test-gray--700">
+            Are you sure you want to delete branch manager
+            <strong> {deletingManager?.name} ?</strong>
+          </p>
+          <p className="test-gray--700">This action cannot be undone.</p>
+        </div>
+        <div className="flex justify-end space-x-3">
+          <button
+            onClick={() => setShowDeleteModal(false)}
+            className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition"
+          >
+            Cancel
+          </button>
+
+          <button
+            onClick={handleDelete}
+            className="px-4 py-2 bg-red-600 rounded-md text-white hover:bg-red-800 transition"
+          >
+            Delete
+          </button>
+        </div>
       </DetailsModal>
     </div>
   );

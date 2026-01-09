@@ -6,9 +6,11 @@ import {
 } from "../../redux/features/branchSlice";
 import Loading from "../shared/IsLoading";
 import Select from "../shared/Select";
-import { useGetAllDistrictsQuery } from "../../redux/features/districtSlice";
 import { useState } from "react";
 import Input from "../shared/Input";
+import { useGetAllProvincesQuery } from "../../redux/features/provinceSlice";
+import { useGetAllPDBQuery } from "../../redux/features/authSlice";
+import DetailsModal from "../shared/Modal";
 
 const BranchManagement = () => {
   const {
@@ -20,8 +22,15 @@ const BranchManagement = () => {
 
   const [deleteBranch] = useDeleteBranchMutation();
   const [addBranch] = useAddBranchMutation();
-  const { data: districtData, isLoading: disLoading } =
-    useGetAllDistrictsQuery();
+  const [province_id, setProvinceId] = useState("");
+  const { data: districts } = useGetAllPDBQuery(
+    { province_id },
+    { skip: !province_id }
+  );
+  const { data: provinceData, isLoading: provLoading } =
+    useGetAllProvincesQuery();
+  const [viewModal, setViewModal] = useState(false);
+  const [selectedBranch, setSelectedBranch] = useState(null);
 
   const [formData, setFormData] = useState({
     branch_name: "",
@@ -36,12 +45,16 @@ const BranchManagement = () => {
       [id]: value,
     }));
   };
-  const handleActionChange = (e, branch_id) => {
+  const handleActionChange = (e, branch) => {
     if (e.target.value === "delete") {
-      handleDelete(branch_id);
+      handleDelete(branch.branch_id);
+    } else if (e.target.value === "view") {
+      setSelectedBranch(branch);
+      setViewModal(true);
     }
     e.target.value = "";
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -70,7 +83,11 @@ const BranchManagement = () => {
       toast.error(error.data?.message || "Failed to delete branch");
     }
   };
-  const actionOptions = [{ label: "Delete", value: "delete" }];
+
+  const actionOptions = [
+    { label: "Delete", value: "delete" },
+    { label: "View", value: "view" },
+  ];
 
   if (isError) {
     return (
@@ -81,12 +98,16 @@ const BranchManagement = () => {
       </div>
     );
   }
-  if (branchLoading || disLoading) {
-    return <Loading loading={branchLoading || disLoading} />;
+  if (branchLoading || provLoading) {
+    return <Loading loading={branchLoading || provLoading} />;
   }
   const branch = branchData?.data || [];
+  const provinceOptions = provinceData?.data.map((prov) => ({
+    value: prov.province_id,
+    label: prov.province_name,
+  }));
   const districtOptions =
-    districtData?.data.map((dist) => ({
+    districts?.data.map((dist) => ({
       value: dist.district_id,
       label: dist.district_name,
     })) || [];
@@ -119,6 +140,20 @@ const BranchManagement = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Select Province
+                  </label>
+                  <Select
+                    id="province_id"
+                    value={province_id}
+                    options={provinceOptions}
+                    onChange={(e) => {
+                      setProvinceId(e.target.value);
+                    }}
+                    className="w-full "
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Select district
                   </label>
                   <Select
@@ -126,6 +161,7 @@ const BranchManagement = () => {
                     value={formData.district_id}
                     options={districtOptions}
                     onChange={handleChange}
+                    disabled={!province_id}
                     className="w-full "
                   />
                 </div>
@@ -206,7 +242,7 @@ const BranchManagement = () => {
                         <Select
                           options={actionOptions}
                           onChange={(e) => {
-                            handleActionChange(e, branch.branch_id);
+                            handleActionChange(e, branch);
                           }}
                         />
                       </td>
@@ -224,6 +260,41 @@ const BranchManagement = () => {
           </div>
         </div>
       </div>
+      <DetailsModal
+        show={viewModal}
+        onClose={() => setViewModal(false)}
+        title={`Total Details of ${selectedBranch?.branch_name} Branch`}
+        size="lg"
+      >
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Branch ID
+              </label>
+              <p className="text-gray-900">{selectedBranch?.branch_id}</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Branch Name
+              </label>
+              <p className="text-gray-900">{selectedBranch?.branch_name}</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                District
+              </label>
+              <p className="text-gray-900">{selectedBranch?.district_name}</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Province
+              </label>
+              <p className="text-gray-900">{selectedBranch?.province_name}</p>
+            </div>
+          </div>
+        </div>
+      </DetailsModal>
     </div>
   );
 };

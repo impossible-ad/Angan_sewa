@@ -249,11 +249,13 @@ export const getAllBranch = async (req, res, next) => {
       b.branch_name,
       b.remarks,
       d.district_name,
-      GROUP_CONCAT(s.name) as services
+      p.province_name
+      
       FROM branch b
-      LEFT JOIN services s ON b.branch_id = s.branch_id
+      
       LEFT JOIN district d ON b.district_id = d.district_id
-      GROUP BY b.branch_id,b.branch_id,b.remarks,d.district_name `
+      LEFT JOIN province p ON d.district_id = p.province_id
+      `
     );
     return res.status(200).json({
       message: "Successfully retrieved all  branch data",
@@ -285,4 +287,3 @@ export const deleteBranch = async (req, res, next) => {
     next(error);
   }
 };
-
