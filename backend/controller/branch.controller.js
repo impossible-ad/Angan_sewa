@@ -243,20 +243,20 @@ export const addBranch = async (req, res, next) => {
 
 export const getAllBranch = async (req, res, next) => {
   try {
-    const [resultB] = await db.execute(
-      `SELECT 
-      b.branch_id,
-      b.branch_name,
-      b.remarks,
-      d.district_name,
-      p.province_name
-      
-      FROM branch b
-      
-      LEFT JOIN district d ON b.district_id = d.district_id
-      LEFT JOIN province p ON d.district_id = p.province_id
-      `
-    );
+    const [resultB] = await db.execute(`
+  SELECT 
+    b.branch_id,
+    b.branch_name,
+    b.remarks,
+    d.district_name,
+    p.province_name,
+    s.service_name
+  FROM branch b
+  LEFT JOIN district d ON b.district_id = d.district_id
+  LEFT JOIN services s ON b.branch_id = s.branch_id
+  LEFT JOIN province p ON d.province_id = p.province_id
+`);
+
     return res.status(200).json({
       message: "Successfully retrieved all  branch data",
       data: resultB,
