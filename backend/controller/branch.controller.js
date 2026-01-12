@@ -250,7 +250,7 @@ export const getAllBranch = async (req, res, next) => {
     b.remarks,
     d.district_name,
     p.province_name,
-    s.service_name
+    s.name as service_name
   FROM branch b
   LEFT JOIN district d ON b.district_id = d.district_id
   LEFT JOIN services s ON b.branch_id = s.branch_id

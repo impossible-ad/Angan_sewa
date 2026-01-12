@@ -7,6 +7,7 @@ import { publicRoutes } from "./PublicRoutes";
 
 const indexRouter = createBrowserRouter([
   { path: "*", element: <NotFound /> },
+
   {
     path: "/manager",
     element: <ManagerLayout />,
