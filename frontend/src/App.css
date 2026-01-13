@@ -1,1 +1,14 @@
+/* 1. External fonts/third-party imports FIRST */
+@import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap");
+
+/* 2. Tailwind import SECOND */
 @import "tailwindcss";
+
+/* 3. Theme configuration */
+@theme {
+  --color-primary-orange: #ff6900;
+  --color-secondary-blue: #061a32;
+  --font-lora: "Lora", sans-serif;
+}
+
+/* 4. Custom utilities LAST */

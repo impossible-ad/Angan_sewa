@@ -8,7 +8,6 @@ import {
   deleteProvince,
   getAllBranch,
   getAllDistrict,
-  
   getAllProvince,
 } from "../controller/branch.controller.js";
 import { isLogin } from "../middleware/isLogin.js";
@@ -42,8 +41,7 @@ branchRouter.post(
 );
 branchRouter.get(
   "/getalldistrict",
-  isLogin,
-  authorizeRoles("admin"),
+
   getAllDistrict
 );
 branchRouter.delete(

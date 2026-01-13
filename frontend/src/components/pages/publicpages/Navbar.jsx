@@ -12,11 +12,9 @@ const AGENCIES = [
 
 /* 🔹 Menu Items (TOP) */
 const MENU_ITEMS = [
-  { label: "Team", link: "/team" },
+  { label: "Services", link: "/services" },
+  { label: "Gallery", link: "/gallery" },
   { label: "Contact", link: "/contact" },
-  { label: "Source", link: "/source" },
-  { label: "Partner", link: "/partner" },
-  { label: "Feature", link: "/feature" },
 ];
 
 const Navbar = () => {
@@ -43,9 +41,9 @@ const Navbar = () => {
             >
               <FaTimes />
             </button>
-
-            <li className="font-medium text-blue-700">Home</li>
-
+            <Link to="">
+              <li className="font-medium text-blue-700">Home</li>
+            </Link>
             {/* Branches Dropdown */}
             <li
               className="relative group cursor-pointer"
