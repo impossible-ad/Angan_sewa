@@ -39,7 +39,7 @@ authRouter.get(
   authorizeRoles("admin"),
   getBManager
 );
-authRouter.get("/getallpdb", isLogin, authorizeRoles("admin"), getAllPDB);
+authRouter.get("/getallpdb", getAllPDB);
 
 authRouter.get("/verifytoken", isLogin, verifyToken);
 

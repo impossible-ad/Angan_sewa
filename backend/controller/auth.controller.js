@@ -233,7 +233,7 @@ export const getBManager = async (req, res, next) => {
 //   }
 // };
 
-export const getAllPDB = async (req, res) => {
+export const getAllPDB = async (req, res, next) => {
   const { province_id, district_id } = req.query;
   try {
     let query = "";
@@ -245,7 +245,7 @@ export const getAllPDB = async (req, res) => {
       params = [province_id];
     } else if (district_id) {
       // Get branches based on district_id
-      query = "SELECT * FROM branch WHERE district_id = ?";
+      query = `SELECT branch_id, branch_name, LOWER(REPLACE(branch_name,' ','-')) AS branch_slug FROM branch WHERE district_id = ?`;
       params = [district_id];
     } else {
       return res

@@ -2,7 +2,7 @@ import db from "../config/dbconnect.js";
 import { paginatedData, paginationTool } from "../utils/paginationHandler.js";
 
 export const getAllService = async (req, res, next) => {
-  const { province_id, district_id, branch_id } = req.query;
+  const { branch_id } = req.params;
 
   try {
     let query = `SELECT 
@@ -10,37 +10,13 @@ export const getAllService = async (req, res, next) => {
    s.name,
    s.description,
    s.address,
-   s.img,
-   s.branch_id,
-   b.branch_name,
-   d.district_id,
-   d.district_name,
-   d.province_id,
-   p.province_name
-
+   s.img
    FROM services s
    LEFT JOIN branch b
    ON s.branch_id = b.branch_id
-   LEFT JOIN district d ON b.district_id = d.district_id
-   LEFT JOIN province p ON d.province_id = p.province_id
-   WHERE 1=1`;
+    WHERE s.branch_id = ?`;
 
-    const queryParams = [];
-
-    if (branch_id) {
-      query += ` AND s.branch_id = ?`;
-      queryParams.push(branch_id);
-    }
-    if (district_id) {
-      query += ` AND d.district_id = ?`;
-      queryParams.push(district_id);
-    }
-    if (province_id) {
-      query += ` AND p.province_id = ?`;
-      queryParams.push(province_id);
-    }
-
-    const [result] = await db.execute(query, queryParams);
+    const [result] = await db.execute(query, [branch_id]);
 
     return res.status(200).json({
       message: "all services are retrieved",
@@ -48,6 +24,7 @@ export const getAllService = async (req, res, next) => {
     });
   } catch (error) {
     next(error);
+    console.log(error);
   }
 };
 

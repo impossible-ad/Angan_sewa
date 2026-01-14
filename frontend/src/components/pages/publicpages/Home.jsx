@@ -2,13 +2,29 @@ import { useState, useEffect } from "react";
 import Select from "../../shared/Select";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../shared/IsLoading";
-import { useGetDistrictsQuery } from "../../../redux/slice/publicSlice";
+import {
+  useGetAllPDBQuery,
+  useGetDistrictsQuery,
+} from "../../../redux/slice/publicSlice";
 
 export const Home = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [selectedDistrict, setSelectedDistrict] = useState("");
-  const [selectedPlace, setSelectedPlace] = useState("");
-  const { data: districtData, isLoading, error } = useGetDistrictsQuery();
+  const [district_id, setSelectedDistrict] = useState("");
+  const [selectedBranch, setSelectedBranch] = useState("");
+
+  const {
+    data: districtData,
+    isLoading: districtLoading,
+    error,
+  } = useGetDistrictsQuery();
+  const { data: branchData, isLoading: branchLoading } = useGetAllPDBQuery(
+    {
+      district_id,
+    },
+    {
+      skip: !district_id,
+    }
+  );
   const navigate = useNavigate();
 
   const districtOptions = districtData?.data.map((dist) => ({
@@ -16,9 +32,13 @@ export const Home = () => {
     label: dist.district_name,
   }));
 
-  // const availablePlaces = selectedDistrict
-  //   ? placesByDistrict[selectedDistrict] || []
-  //   : [];
+  const branchOptions =
+    branchData?.data?.map((branch) => ({
+      id: branch.branch_id,
+      value: branch.branch_id,
+      label: branch.branch_name,
+      slug: branch.branch_slug,
+    })) || [];
 
   const images = [
     "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=1920&h=1080&fit=crop", // House cleaning
@@ -27,10 +47,11 @@ export const Home = () => {
     "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1920&h=1080&fit=crop", // Gardening
   ];
   const handlePlaceChange = (e) => {
-    const place = e.target.value;
-    setSelectedPlace(place);
-    if (place) {
-      navigate(`/services/${place}`);
+    const branchId = Number(e.target.value);
+    const branch = branchOptions.find((b) => b.id === Number(branchId));
+    setSelectedBranch(branchId);
+    if (branch) {
+      navigate(`/services/${branch.slug}`, { state: { branchId: branch.id } });
     }
   };
 
@@ -41,8 +62,8 @@ export const Home = () => {
     return () => clearInterval(interval);
   }, [images.length]);
 
-  if (isLoading) {
-    return <Loading loading={isLoading} />;
+  if (districtLoading || branchLoading) {
+    return <Loading loading={districtLoading || branchLoading} />;
   }
 
   return (
@@ -79,21 +100,21 @@ export const Home = () => {
             <div className="flex gap-4">
               <Select
                 options={districtOptions}
-                value={selectedDistrict}
+                value={district_id}
                 className="w-full"
                 onChange={(e) => {
                   setSelectedDistrict(e.target.value);
-                  setSelectedPlace("");
+                  setSelectedBranch("");
                 }}
                 placeholder="Select your district"
               />
-              {/* <Select
-                options={availablePlaces}
-                value={selectedPlace}
+              <Select
+                options={branchOptions}
+                value={selectedBranch}
                 className="w-full"
                 onChange={handlePlaceChange}
                 placeholder="Select your place"
-              /> */}
+              />
             </div>
           </div>
         </div>

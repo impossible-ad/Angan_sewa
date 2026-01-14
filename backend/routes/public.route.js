@@ -6,7 +6,7 @@ import {
 
 const publicRouter = express.Router();
 
-publicRouter.get("/getallservices", getAllService);
+publicRouter.get("/getallservices/:branch_id", getAllService);
 publicRouter.get("/getallgallery", getAllGallery);
 
 export default publicRouter;
